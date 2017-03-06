@@ -1,0 +1,25 @@
+Package: inacSite
+Title: placeholder
+Version: 0.0.0.9000
+Authors@R: person("Julio", "Trecenti", email = "jtrecenti@abj.org.br", role = c("aut", "cre"))
+Description: placeholder.
+Depends: R (>= 3.3.2)
+License: GNU-GPL v3
+Encoding: UTF-8
+LazyData: true
+Imports: stringr,
+    lubridate,
+    janitor,
+    cnc,
+    tpur,
+    magrittr,
+    tidyverse,
+    forcats,
+    dplyr,
+    tidyr,
+    abjData,
+    abjutils
+Remotes:
+    abjur/cnc,
+    abjur/tpur,
+    abjur/abjData
