@@ -1,4 +1,4 @@
-baseurl = ""
+baseurl = "https://abjur.github.io/inacBook"
 title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
@@ -18,23 +18,23 @@ googleAnalytics = ""
   # Nav links in the side bar
   [[params.navlinks]]
   name = "Home"
-  url = "inacSite"
+  url = ""
 
   [[params.navlinks]]
   name = "Historias"
-  url = "inacSite/historias/"
+  url = "historias/"
 
   [[params.navlinks]]
   name = "About"
-  url = "inacSite/sobre/"
+  url = "sobre/"
 
   [[params.navlinks]]
   name = "Metodologia"
-  url = "inacSite/metodologia/"
+  url = "metodologia/"
   
   [[params.navlinks]]
   name = "Get in touch"
-  url = "inacSite/contato/"
+  url = "contato/"
   
   [params.social]
   facebook      = "full page or profile url in facebook"
