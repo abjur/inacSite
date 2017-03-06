@@ -1,4 +1,4 @@
-baseurl = "https://abjur.github.io/inacBook"
+baseurl = "https://abjur.github.io/inacSite"
 title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
