@@ -1,4 +1,4 @@
-baseurl = "inacSite"
+baseurl = ""
 title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
@@ -18,23 +18,23 @@ googleAnalytics = ""
   # Nav links in the side bar
   [[params.navlinks]]
   name = "Home"
-  url = ""
+  url = "inacSite"
 
   [[params.navlinks]]
   name = "Historias"
-  url = "historias/"
+  url = "inacSite/historias/"
 
   [[params.navlinks]]
   name = "About"
-  url = "sobre/"
+  url = "inacSite/sobre/"
 
   [[params.navlinks]]
   name = "Metodologia"
-  url = "metodologia/"
+  url = "inacSite/metodologia/"
   
   [[params.navlinks]]
   name = "Get in touch"
-  url = "3-contato/"
+  url = "inacSite/contato/"
   
   [params.social]
   facebook      = "full page or profile url in facebook"
