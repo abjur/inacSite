@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Danos\"\nauthor: \"Frida Gomam\"\nimage: \"img/portfolio/a4-paper.jpg\"\ndate: 2015-07-23T21:13:14-05:00\ncategories: [\"R\"]\ndraft: false\nweight: 0\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(collapse = TRUE)\n```\n\n# R Markdown\n\nThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.\n\nYou can embed an R code chunk like this:\n\n```{r cars}\nsummary(cars)\nfit <- lm(dist ~ speed, data = cars)\nfit\n```\n\n# Including Plots\n\nYou can also embed plots. See Figure \\@ref(fig:pie) for example:\n\n```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}\npar(mar = c(0, 1, 0, 1))\nplot(1:10)\n```\n",
+    "created" : 1488817749961.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1951527276",
+    "id" : "8179D840",
+    "lastKnownWriteTime" : 1488816320,
+    "last_content_update" : 1488816320,
+    "path" : "~/abj/inacSite/content/historias/danos.Rmd",
+    "project_path" : "content/historias/danos.Rmd",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

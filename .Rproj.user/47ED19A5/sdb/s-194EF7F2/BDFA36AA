@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "baseurl = \"http://localhost:4321/\"\ntitle = \"Monitor da Improbidade\"\ntheme = \"hugo-tracks-theme\"\ndisqusShortname = \"jurimetria\"\ngoogleAnalytics = \"\"\n\n[Permalinks]\n    blog = \"/blog/:year/:month/:day/:filename/\"\n    \n[params]\n  description = \"Describe your website\"\n  copyright = \"&copy;2017 ABJ\"\n  sidebarAbout = [\n    \"INAC\",\n    \"INAC2.\"\n  ]\n\n  # Contact page\n  email = \"contato@abj.org.br\"\n\n  # Nav links in the side bar\n  [[params.navlinks]]\n  name = \"Home\"\n  url = \"\"\n\n  [[params.navlinks]]\n  name = \"Historias\"\n  url = \"historias/\"\n\n  [[params.navlinks]]\n  name = \"About\"\n  url = \"sobre/\"\n\n  [[params.navlinks]]\n  name = \"Metodologia\"\n  url = \"metodologia/\"\n  \n  [[params.navlinks]]\n  name = \"Get in touch\"\n  url = \"contato/\"\n  \n  [params.social]\n  facebook      = \"full page or profile url in facebook\"\n  googleplus    = \"full profile url in googleplus\"\n  email         = \"email@example.com\"\n  twitter       = \"full profile url in twitter\"\n  linkedin      = \"full profile url in linkedin\"\n  stackoverflow = \"full profile url in stackoverflow\"\n  instagram     = \"full profile url in instagram\"\n  github        = \"full profile url in github\"\n",
+    "created" : 1488815995238.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "9018071",
+    "id" : "BDFA36AA",
+    "lastKnownWriteTime" : 1488816449,
+    "last_content_update" : 1488816449359,
+    "path" : "~/abj/inacSite/config.toml",
+    "project_path" : "config.toml",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}
