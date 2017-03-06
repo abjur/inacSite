@@ -19,7 +19,9 @@ Imports: stringr,
     tidyr,
     abjData,
     abjutils,
-    blogdown
+    blogdown,
+    rmarkdown,
+    knitr
 Remotes:
     abjur/cnc,
     abjur/tpur,
