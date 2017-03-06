@@ -1,4 +1,4 @@
-baseurl = ""
+baseurl = "inacSite"
 title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
