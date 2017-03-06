@@ -18,8 +18,10 @@ Imports: stringr,
     dplyr,
     tidyr,
     abjData,
-    abjutils
+    abjutils,
+    blogdown
 Remotes:
     abjur/cnc,
     abjur/tpur,
-    abjur/abjData
+    abjur/abjData,
+    rstudio/blogdown
