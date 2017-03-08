@@ -9,26 +9,394 @@ weight: 0
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE)
+library(tidyverse)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+
+data(tidy_cnc, package = 'cnc')
+data(br_uf_map, package = 'abjData')
+data(cadmun, package = 'abjData')
+data(pnud_uf, package = 'abjData')
+
+cadmun %<>% distinct(cod, uf) %>% mutate_all(as.character)
+pnud_uf %<>% filter(ano == 2010) %>% 
+  select(uf, ufn, popt) %>% 
+  mutate(uf = as.character(uf)) %>% 
+  inner_join(cadmun, c('uf' = 'cod')) %>% 
+  select(id = uf.y, ufn, popt)
+
+tidy_improb <- tidy_cnc %>% 
+  filter(tipo_pena == "Trânsito em julgado",
+         !assunto_penal_any, 
+         year(dt_pena) >= 2009,
+         year(dt_pena) <= 2015,
+         vl_ressarcimento <= 5.877361e+07)
+
+project_dir <- normalizePath("../..")
+
+source(sprintf("%s/R/add_uf_consolidado.R", project_dir))
 ```
 
-# R Markdown
+```{r}
+condenados_improb_ano <- tidy_improb %>% 
+  count(year(dt_pena))
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+tidy_ressarcimento <- tidy_improb %>% 
+  filter(teve_ressarcimento, vl_ressarcimento > 0)
 
-You can embed an R code chunk like this:
+tidy_ressarcimento_sem_estranhos <- tidy_ressarcimento %>% 
+  filter(vl_ressarcimento <= 5.877361e+07)
 
-```{r cars}
-summary(cars)
-fit <- lm(dist ~ speed, data = cars)
-fit
+tidy_ressarcimento_ano <- tidy_ressarcimento_sem_estranhos %>% 
+  mutate(ano = year(dt_pena)) %>% 
+  group_by(ano) %>% 
+  summarise(ress = sum(vl_ressarcimento, na.rm = T))
+
 ```
 
-# Including Plots
+### Tamanho dos danos
 
-You can also embed plots. See Figure \@ref(fig:pie) for example:
+Todo os anos, `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são condenadas por improbidade administrativa no Brasil. Aproximadamente `r scales::percent(nrow(tidy_ressarcimento)/nrow(tidy_improb))` desses condenados são obrigados a ressarcir integralmente os danos causados, que ao longo da história do CNIA já somam `r round(sum(tidy_ressarcimento_ano$ress)/10^6,0)` milhões de reais. Só em 2013 e 2014, a justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.
 
-```{r pie, fig.cap='A fancy pie chart.', tidy=FALSE}
-par(mar = c(0, 1, 0, 1))
-plot(1:10)
+<!-- ### Tendência -->
+
+<!-- Essa tendência pode indicar uma maior eficácia no combate à improbidade administrativa, mas também pode indicar uma melhora no cadastramento de informações no CNIA. -->
+
+```{r}
+
+tidy_ressarcimento_ano %>%
+  filter(ano >= 2009) %>% 
+  ggplot(aes(x = ano, y = round(ress/10^6))) +
+  geom_bar(fill = 'royalblue', stat = 'identity', color = 'black') + 
+  theme_bw(15) +
+  scale_x_continuous(breaks = min(tidy_ressarcimento_ano$ano):max(tidy_ressarcimento_ano$ano)) +
+  ylab("Ressarcimento cadastrado até\no momento (MM R$)") + 
+  xlab("Ano de condenação")
 ```
+
+```{r}
+tidy_ressarcimento_sem_estranhos %>% 
+  filter(vl_ressarcimento > 10) %>% 
+  mutate(ano = year(dt_pena)) %>% 
+  group_by(ano) %>% 
+  do(qtl = quantile(.$vl_ressarcimento) %>% 
+       broom::tidy()) %>% 
+  unnest(qtl) %>% 
+  mutate(names = factor(names,c("0%","25%","50%","75%","100%")),
+         x = round(x/10^3, 0)) %>% 
+  spread(names, x) %>% 
+  mutate(`100%` = round(`100%`, 0)) %>% 
+  setNames(c("Ano", "Mínimo","1º Quartil","Mediana","3º Quartil","Máximo (MM R$)")) %>% 
+  DT::datatable(caption = "Estatísticas descritivas dos ressarcimentos do CNIA em milhares de reais.")
+```
+
+### Tipos de condenação
+
+As condenações estão dividas nos vários tipos de improbidade previstos pela Lei 8.429/92. Visualiando os ressarcimentos de danos em cada tipo de improbidade concluímos que a 511 milhões de reais foram ressarcidos em processos por danos ao erário. 
+
+```{r}
+tidy_improb %>% 
+  mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros") %>% 
+           str_to_title() %>% 
+           str_wrap(10)) %>% 
+  count(assunto_nm_1) %>% 
+  arrange(desc(n)) %>% 
+  mutate(p = scales::percent(n/sum(n))) %>% 
+  set_names(c("Motivo da condenação","Frequência","%")) %>% 
+  DT::datatable(caption = "Frequência dos assuntos processuais nas condenações por improbidade admnistrativa.")
+```
+
+```{r}
+tidy_improb %>% 
+  mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros") %>% 
+           str_to_title() %>% 
+           str_wrap(10)) %>% 
+  group_by(assunto_nm_1) %>% 
+  summarise(ress = round(sum(vl_ressarcimento, na.rm = T)/10^6, 0)) %>% 
+  arrange(desc(ress)) %>% 
+  mutate(p = scales::percent(ress/sum(ress))) %>% 
+  set_names(c("Motivo da condenação","Ressarcimento (MM R$)","%")) %>% 
+  DT::datatable(caption = "Frequência dos assuntos processuais nas condenações por improbidade admnistrativa.")
+```
+
+
+<!-- Excluindo as 6 condenações de 2013 e 2014 listadas abaixo, a discrepância entre os totais ressarcidos nos anos fica menor. Entretanto, ainda identifica-se um aumento no terceiro quartil dos anos de 2013 e 2014. -->
+
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   select(dt_pena, vl_ressarcimento) %>% -->
+<!--   top_n(-(3452-6)) %>%  -->
+<!--   mutate(ano = year(dt_pena)) %>%  -->
+<!--   filter(ano >= 2009, ano <= 2015) %>%  -->
+<!--   group_by(ano) %>%  -->
+<!--   summarise(ress = sum(vl_ressarcimento)/10^6) %>% -->
+<!--   ggplot(aes(x = ano, y = ress)) + -->
+<!--    geom_bar(fill = 'royalblue', stat = 'identity', color = 'black') +  -->
+<!--   theme_bw(15) + -->
+<!--   scale_x_continuous(breaks = min(ressarcimentos_por_ano_sem_estranhos$ano):max(ressarcimentos_por_ano_sem_estranhos$ano)) + -->
+<!--   ylab("Ressarcimento cadastrado até\no momento (MM R$)") +  -->
+<!--   xlab("Ano de condenação") -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   select(dt_pena, vl_ressarcimento) %>% -->
+<!--   top_n(-(3452-6)) %>%  -->
+<!--   mutate(ano = year(dt_pena)) %>%  -->
+<!--   filter(ano >= 2009, ano <= 2015) %>%  -->
+<!--   group_by(ano) %>%  -->
+<!--   nest(vl_ressarcimento) %>%  -->
+<!--   mutate(qtl = map(data,~broom::tidy(quantile(.x$vl_ressarcimento)))) %>%  -->
+<!--   unnest(qtl) %>%  -->
+<!--   mutate(names = factor(names,c("0%","25%","50%","75%","100%")), -->
+<!--          x = round(x/10^6, 3)) %>%  -->
+<!--   spread(names, x) %>%  -->
+<!--   setNames(c("Ano", "Mínimo","1º Quartil","2º Quartil","3º Quartil","Máximo")) -->
+<!-- ``` -->
+
+<!-- ### Órgãos -->
+
+```{r}
+
+lista_de_regex <- list(regex_vereadores = regex("vereadores|c[âaâã}]mara", ignore_case = T),
+regex_secretaria = regex("secretaria", ignore_case = T),
+regex_municipio = regex("munic[íi]pio", ignore_case = T),
+regex_prefeitura = regex("prefeit", ignore_case = T),
+regex_assembleia_legislativa = regex("assembl[ée]ia legis", ignore_case = T),
+regex_policia = regex("pol[íi]cia", ignore_case = T),
+regex_poder_executivo = regex("executivo|poder executivo", ignore_case = T),
+regex_poder_legislativo = regex("poder legislativo", ignore_case = T),
+regex_hospital = regex("hospitais", ignore_case = T),
+regex_correios = regex("correio|ect|ebct", ignore_case = T),
+regex_caixa = regex("CAIXA ECON[Ôo]MICA FEDERAL|cef", ignore_case = T),
+regex_inss = regex("INSTITUTO NACIONAL DO SEGURO|INSS", ignore_case = T))
+
+joga_resto_no_outros <- function(string, N, labell = 'outros'){
+
+d <- data_frame(coluna = string)
+
+left_join(d, y = d %>% count(coluna), by = 'coluna') %>% 
+  mutate(coluna = ifelse(n < N, labell, coluna)) %>% 
+  with(coluna)
+}
+
+troca_string_por_regex <- function(vetor, regexes){
+  map_chr(vetor, function(x){
+       pareamentos <- map(regexes, str_detect, string = x) %>% 
+       keep(~.x) %>% 
+       names %>% 
+       paste(collapse = ', ')
+      
+       if(pareamentos == ''){pareamentos <- x}
+       return(pareamentos)
+  })
+}
+
+tidy_improb <-  tidy_improb %>% 
+  mutate(novo_orgao = troca_string_por_regex(orgao, lista_de_regex),
+         novo_orgao = joga_resto_no_outros(novo_orgao, 5),
+         novo_orgao = str_replace_all(novo_orgao,"regex_",""),
+         novo_orgao = str_replace_all(novo_orgao,"_"," "),
+         novo_orgao = str_to_title(novo_orgao)) %>% 
+  replace_na(list(novo_orgao = "Não Identificado"))
+
+tidy_ressarcimento <- tidy_improb %>% 
+  filter(teve_ressarcimento, vl_ressarcimento > 0)
+
+tidy_ressarcimento_sem_estranhos <- tidy_ressarcimento %>% 
+  filter(vl_ressarcimento <= 5.877361e+07)
+
+tidy_ressarcimento_ano <- tidy_ressarcimento_sem_estranhos %>% 
+  mutate(ano = year(dt_pena)) %>% 
+  group_by(ano) %>% 
+  summarise(ress = sum(vl_ressarcimento, na.rm = T))
+```
+
+### Órgãos afetados
+
+A administração municipal é a que mais sofre com as condenações por improbidade. 381 milhões foram ressarcidos. Mas, como muitos registros não discriminam o órgão dos condenados, então uma outra parte significativa das condenações e dos ressarcimentos não estão associadas a nenhum órgão em particular.
+
+```{r}
+colunas <- c("Órgão", "Número de condenações")
+
+tidy_improb %>% 
+  group_by(novo_orgao) %>% 
+  count() %>%
+  arrange(desc(n)) %>%
+  ungroup() %>% 
+  setNames(colunas) %>%
+  DT::datatable()
+```
+
+```{r}
+colunas <- c("Órgão", "Valor do ressarcimento (MM R$)")
+
+tidy_improb %>% 
+  group_by(novo_orgao) %>% 
+  summarise(vl_ressarcimento = round(sum(vl_ressarcimento)/10^6,0)) %>% 
+  arrange(desc(vl_ressarcimento)) %>%
+  ungroup() %>% 
+  setNames(colunas) %>%
+  DT::datatable()
+```
+
+
+<!-- ### Esfera -->
+
+<!-- Com relação às esferas, os danos em sua maior parte vêm da esfera estadual. Entretanto, a proporção de ressarcimentos vinda da esfera federal chega a 37%. -->
+
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   group_by(esfera_processo, tipo_pena) %>%  -->
+<!--   summarise(vl_ressarcimento = sum(vl_ressarcimento)/10^6) %>%  -->
+<!--   spread(tipo_pena, vl_ressarcimento) %>%  -->
+<!--   ungroup() %>%  -->
+<!--   mutate(esfera_processo = str_to_title(esfera_processo)) %>%  -->
+<!--   setNames(c("Esfera",colunas[2:3])) %>%  -->
+<!--   knitr::kable() -->
+<!-- ``` -->
+
+
+<!-- ### Tipos de pessoa -->
+
+### Pessoas jurídicas
+
+```{r}
+nro_pessoas_juridicas <- tidy_improb %>% 
+  filter(tipo_pessoa == "J") %>% 
+  nrow
+
+ressarcimento_pj <- tidy_improb %>% 
+  filter(tipo_pessoa == "J") %>% 
+  with(sum(vl_ressarcimento))
+```
+
+
+`r scales::percent(nro_pessoas_juridicas/nrow(tidy_improb))` dos condenados por improbidade são pessoas jurídicas. Entretanto,`r scales::percent(ressarcimento_pj/sum(tidy_improb$vl_ressarcimento))` do total de ressarcimentos vem de dinheiro de empresas. Isso acontece porque uma condenação de pessoa jurídica rende, em média, R$300.000,00 ao Estado.
+
+```{r}
+
+tidy_improb %>% 
+  group_by(tipo_pessoa) %>% 
+  summarise(vl_ressarcimento = mean(vl_ressarcimento)/10^3) %>% 
+  mutate(tipo_pessoa = ifelse(tipo_pessoa == "J", 
+                              "Pessoas\nJurídicas","Pessoas\nFísicas")) %>% 
+  ggplot(aes(x = tipo_pessoa, y = vl_ressarcimento)) +
+  geom_bar(fill = 'royalblue', stat = 'identity') +
+  ylab("Ressarcimento médio (MM R$)") +
+  xlab('') +
+  theme_bw(15)
+
+```
+
+### Distribuição geográfica
+
+
+```{r ress_abs}
+
+N <- 12
+
+# cortes <- c(0, rep(c(1,5), N)*rep(10^(1:N), each = 2)) 
+
+cortes <- c(0, 10^(1:7),1.2*10^7,2.5*10^7,5*10^7,10^8,1.2*10^8,2.5*10^8)
+
+brks <- cut(c(cortes), breaks = c(cortes))
+
+ lbs <- c("0","<10","10<100","100<1M",
+          "1M<10M","10M<100M","100M<1MM","1MM<10MM","10MM<12MM",
+        "12MM<25MM","25MM<50MM","50MM<100MM","100MM<120MM","120MM<250MM")
+
+#lbs <- brks
+
+p_absoluto <- tidy_ressarcimento_sem_estranhos %>%
+    mutate(id = uf_processo_consolidado) %>%
+    group_by(id, tipo_pena) %>%
+    summarise(vl_ressarcimento = sum(vl_ressarcimento)) %>%
+    ungroup() %>% 
+    complete(id, tipo_pena, fill = list(vl_ressarcimento = 0)) %>% 
+    mutate(vl_ressarcimento = cut(vl_ressarcimento, cortes)) %>% 
+    inner_join(br_uf_map) %>% {
+      ggplot(.) +
+        geom_map(aes(x = long, y = lat, map_id = id, fill = vl_ressarcimento), color = 'gray30', map = ., data = .) +
+        scale_fill_brewer(palette = 'PuRd', breaks = brks, labels = lbs, name = 'Valor do ressarcimento') + 
+        coord_equal() +
+        theme_void()
+    }
+
+cortes_tx <- c(0,0.1,0.25,0.5,1,2.5,5,10,15,20,30,40)
+
+brks_tx <- cut(c(cortes_tx), breaks = c(cortes_tx))
+
+lbs_tx <- brks_tx
+
+p_relativo <- tidy_ressarcimento_sem_estranhos %>%
+    mutate(id = uf_processo_consolidado) %>%
+    group_by(id) %>%
+    summarise(vl_ressarcimento = sum(vl_ressarcimento, na.rm = T)) %>%
+    inner_join(pnud_uf, 'id') %>%
+    mutate(vl_ressarcimento = vl_ressarcimento / popt) %>%
+    ungroup() %>% 
+    mutate(vl_ressarcimento = cut(vl_ressarcimento, cortes_tx)) %>% 
+    inner_join(br_uf_map) %>% {
+      ggplot(.) +
+        geom_map(aes(x = long, y = lat, map_id = id, fill = vl_ressarcimento), color = 'gray30', map = ., data = .) +
+        scale_fill_brewer(palette = 'PuRd', breaks = brks_tx, labels = lbs_tx, name = 'Ressarcimento per capita \n (R$\\habitante)') + 
+        coord_equal() +
+        theme_void()
+    }
+```
+
+A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.
+
+```{r}
+tidy_ressarcimento_sem_estranhos %>%
+    mutate(id = uf_processo_consolidado) %>%
+    group_by(id) %>%
+    summarise(vl_ressarcimento = sum(vl_ressarcimento),
+              total = n()) %>% 
+  DT::datatable()
+```
+
+```{r}
+multiplot(p_absoluto, p_relativo)
+```
+
