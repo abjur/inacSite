@@ -1,0 +1,132 @@
+---
+title: "Sobre a base"
+author: "Frida Gomam"
+image: "img/portfolio/a4-paper.jpg"
+date: 2015-07-23T21:13:14-05:00
+categories: ["R"]
+draft: false
+weight: 0
+---
+
+```{r}
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+
+data(tidy_cnc, package = 'cnc')
+
+tidy_cnc <- tidy_cnc %>% 
+  mutate(ano = year(dt_pena))
+```
+
+
+O CNIA mudou com o tempo. A resolução [44/07](http://www.cnj.jus.br///images/atos_normativos/resolucao/resolucao_44_20112007_17062013181040.pdf) do CNJ resolve 
+
+> [...] Art. 1º Instituir o Cadastro Nacional de Condenados por ato de Improbidade Administrativa - CNCIA, que reunirá as informações do Poder Judiciário sobre pessoas físicas e jurídicas definitivamente condenadas por atos de improbidade administrativa no Brasil, nos termos da Lei 8.429/92.
+
+<!-- Desse artigo vago, entende-se que estão cadastrados na base os *definitivamente* condenados por improbidade admnistrativa, além daqueles que foram condenados, definitivamente ou não, por atos que ocasionem a inelegibilidade do réu. -->
+<!-- Essa interpretação é correta, mas o cadastro apresenta algumas falhas. -->
+
+Isso quer dizer que, à princípio, o cadastro foi criado para conter apenas condenações por improbidade administrativa que já transitram em julgado (definitivas). Entretanto, em 2013 esse artigo foi modificado para incluir atos, definitivos ou não, que ocasionem a inelegibilidade do réu, como tráfico de drogas e estupros. Essa modificação deu origem a novos padrões no CNIA.
+
+> Art. 1º Instituir o Cadastro Nacional de Condenados por Ato de Improbidade Administrativa e por Ato que implique Inelegibilidade - CNCIAI, o qual reunirá as informações do Poder Judiciário sobre pessoas físicas e jurídicas definitivamente condenadas por atos de improbidade no Brasil, nos termos da Lei 8.429, de 2 de junho de 1992, e por atos que ocasionem a inelegibilidade do réu, nos termos da Lei Complementar nº 64, de 18 de maio de 1990. (Redação dada pela Resolução nº 172, de 8 de março de 2013).
+
+```{r}
+p1 <- tidy_cnc %>%
+  distinct(n_processo, .keep_all = T) %>% 
+  filter(dt_pena > min(dt_cadastro)) %>% 
+  mutate(ano = year(dt_cadastro),
+         assunto_penal_any = ifelse(assunto_penal_any, "Sim", "Não")) %>% 
+  group_by(ano) %>% 
+  count(assunto_penal_any) %>% 
+  ggplot(aes(x = ano, y = n)) +
+  geom_bar(aes(fill = assunto_penal_any), stat = 'identity', position = 'dodge') +
+  theme_bw(15) +
+  theme(legend.position = 'bottom') +
+  scale_fill_hue(name = "O processo é criminal?\n") +
+  scale_x_continuous(breaks = 2007:2015) +
+  xlab("Ano de cadastro") +
+  ylab("Contagem")
+
+p2 <- tidy_cnc %>%
+    distinct(n_processo, .keep_all = T) %>% 
+    filter(dt_pena > min(dt_cadastro)) %>% 
+    mutate(ano = year(dt_cadastro),
+           assunto_penal_any = ifelse(assunto_penal_any, "Sim", "Não")) %>% 
+    group_by(ano) %>% 
+    count(tipo_pena) %>% 
+    ggplot(aes(x = ano, y = n)) +
+    geom_bar(aes(fill = tipo_pena), stat = 'identity', position = 'dodge') +
+    theme_bw(15) +
+    theme(legend.position = 'bottom') +
+    scale_fill_hue(name = "Tipo de condenação\n") +
+    scale_x_continuous(breaks = 2007:2015) +
+    xlab("Ano de cadastro") +
+  ylab("Contagem")
+
+p2
+```
+
+A mistura de sentenças definitivas e sentenças não definitivas deixou o CNIA mais confuso. O CNIA separa *definitivo* como "Trânsito em Julgado", e define o resto como "deciões de órgãos colegiados", mas a adição desse tipo de processo fez com que começassem a aparecer sentenças que não se encaixam em nenhuma das possibilidades previstas pela resolução. Por exemplo, existem 938 condenações por órgãos colegiados que não resultaram em inelegibilidade.
+
+```{r}
+tidy_cnc %>% 
+  count(tipo_pena, teve_inelegivel) %>% 
+  spread(teve_inelegivel, n) %>% 
+  setNames(c("Tipo de condenação", "Sem inelegibilidade", "Com inelegibilidade")) %>% 
+  DT::datatable(caption = "Contagem de condenações por tipo de condenação e por inelegibilidade do réu.")
+```
+
+Para compreender melhor que registros compõem o CNIA hoje, é necessário separar os casos pelo motivo com que foram cadastrados. Processos de improbidade administrativa correspondem aos casos cadastrados antes de 2013, enquanto processos cadastrados apenas por conta da inelegibilidade passaram a ser cadastrados partindo desse ano. Antes de 2013, os processos são apenas casos de improbidade administrativa, enquanto a partir de 2013 a maioria dos casos são processos penais, pois a maior parte das condenações à inelegibilidade é desse tipo.
+
+```{r}
+p1
+```
+
+```{r}
+tidy_improb <- tidy_cnc %>% 
+  filter(!assunto_penal_any, tipo_pena == "Trânsito em julgado")
+```
+
+Como o nosso interesse aqui é tratar dos casos de improbidade admnistrativa, vamos filtrar os casos tomando apenas as condenações cíveis que transitaram em julgado, assumindo que as definições do CNIA estejam corretas.
+
