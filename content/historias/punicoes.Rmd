@@ -9,13 +9,14 @@ weight: 0
 ---
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-httr::GET('https://raw.githubusercontent.com/abjur/inacBook/master/index.Rmd', 
-          httr::write_disk('temp.Rmd'))
+# httr::GET('https://raw.githubusercontent.com/abjur/inacBook/master/index.Rmd', 
+#           httr::write_disk('temp.Rmd'))
 ```
 
-```{r child = 'temp.Rmd'}
+```{r}
+# child = 'temp.Rmd'
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-file.remove('temp.Rmd')
+# file.remove('temp.Rmd')
 ```
