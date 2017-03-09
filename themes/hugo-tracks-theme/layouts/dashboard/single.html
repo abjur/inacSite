@@ -1,0 +1,90 @@
+<html lang="{{ .Site.LanguageCode }}">
+  <head>{{ partial "head.html" . }}</head>
+  <body>
+<div id="root">
+      <div class="container-fluid">
+        <div class="row site-header">
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12 top-navigation">
+                {{ partial "topnavigation.html" . }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10 header col-md-offset-1">
+                {{ partial "header.html" . }}
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+      <div class="col-xs-12 col-sm-8 col-md-8 col-md-offset-2 content-column white-background">
+  {{ partial "mobileNavToggle.html" . }}
+  <div class="row">
+    <div class="col-lg-8 col-md-offset-2">
+      <div class="content-column-content">
+        
+        <div style="border:1px solid black;height:100px;">
+        <form id='filtros' action="" method="GET">
+          <select id="uf">
+            
+            <option value="index_AC" selected>AC</option>
+            <option value="index_AL">AL</option>
+            <option value="index_AM">AM</option>
+            <option value="index_AP">AP</option>
+            <option value="index_BA">BA</option>
+            <option value="index_CE">CE</option>
+            <option value="index_DF">DF</option>
+            <option value="index_ES">ES</option>
+            <option value="index_GO">GO</option>
+            <option value="index_MA">MA</option>
+            <option value="index_MG">MG</option>
+            <option value="index_MS">MS</option>
+            <option value="index_MT">MT</option>
+            <option value="index_PA">PA</option>
+            <option value="index_PB">PB</option>
+            <option value="index_PE">PE</option>
+            <option value="index_PI">PI</option>
+            <option value="index_PR">PR</option>
+            <option value="index_RJ">RJ</option>
+            <option value="index_RN">RN</option>
+            <option value="index_RO">RO</option>
+            <option value="index_RR">RR</option>
+            <option value="index_RS">RS</option>
+            <option value="index_SC">SC</option>
+            <option value="index_SE">SE</option>
+            <option value="index_SP">SP</option>
+            <option value="index_TO">TO</option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary">Vai</button>
+            
+        </form>
+        </div>
+        
+         <h1>{{ .Title }}</h1>
+         {{ .Content }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row site-footer">
+          <div class="col-md-12">
+            {{ partial "footer.html" . }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{ partial "scripts.html" . }}
+    
+    <script type="text/javascript">
+    $('#uf').change(function() {
+      $('#filtros').attr('action', "http://127.0.0.1:4321/dashboard/" + 
+      $('#uf option:selected').attr('value')) + '/';
+    });
+    </script>
+    
+  </body>
+</html>
+
