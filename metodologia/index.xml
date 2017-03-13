@@ -15,6 +15,420 @@
       <pubDate>Sat, 05 Nov 2016 21:05:33 +0530</pubDate>
       
       <guid>https://abjur.github.io/inacSite/metodologia/</guid>
+      <description>&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;multiplot &amp;lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots &amp;lt;- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use &amp;#39;cols&amp;#39; to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout &amp;lt;- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx &amp;lt;- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &amp;#39;dplyr&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &amp;#39;package:stats&amp;#39;:
+## 
+##     filter, lag&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following objects are masked from &amp;#39;package:base&amp;#39;:
+## 
+##     intersect, setdiff, setequal, union&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyr)
+library(lubridate)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## Loading required package: methods&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## 
+## Attaching package: &amp;#39;lubridate&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## The following object is masked from &amp;#39;package:base&amp;#39;:
+## 
+##     date&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+
+data(tidy_cnc, package = &amp;#39;cnc&amp;#39;)
+
+tidy_cnc &amp;lt;- tidy_cnc %&amp;gt;% 
+  mutate(ano = year(dt_pena))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Alimentamos o Monitor da Improbidade com o antigo Cadastro Nacional de Condenações Cíveis por Improbidade Admnistrativa (CNCIA). Esse cadstro foi instituído pela resolução &lt;a href=&#34;http://www.cnj.jus.br/atos-normativos?documento=157&#34;&gt;44/07&lt;/a&gt; do CNJ, com um escopo de trabalho muito claro:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[esta resolução visa] Art. 1º Instituir o Cadastro Nacional de Condenados por ato de Improbidade Administrativa - CNCIA, que reunirá as informações do Poder Judiciário sobre pessoas físicas e jurídicas definitivamente condenadas por atos de improbidade administrativa no Brasil, nos termos da Lei 8.429/92.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;!-- Desse artigo vago, entende-se que estão cadastrados na base os *definitivamente* condenados por improbidade admnistrativa, além daqueles que foram condenados, definitivamente ou não, por atos que ocasionem a inelegibilidade do réu. --&gt;
+&lt;!-- Essa interpretação é correta, mas o cadastro apresenta algumas falhas. --&gt;
+&lt;p&gt;Na criação do CNCIA, o CNJ também foi claro com relação a dois outros pontos: os responsáveis pelo cadastro e o público alvo das informações. A resolução 44/07 define que o acesso à base deve ser feito online, em um site aberto ao público, e que o CNJ é responsável pelo preenchimento do banco.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 5º O Cadastro Nacional de Condenados por ato de Improbidade Administrativa terá exposição permanente através da Internet, em setor próprio da pagina eletrônica do Conselho Nacional de Justiça, permitindo-se a qualquer interessado o livre acesso ao seu conteúdo.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;O fluxo de alimentação da base era simples: os órgãos judiários enviavam as condenações definitivas ao CNJ, que a partir daí eram consolidadas e incorporadas ao CNCIA. Após um certo tempo, os registros deveriam ser excluídos.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 2º - A gestão do Cadastro Nacional de Condenados por ato de Improbidade Administrativa compete ao Conselho Nacional de Justiça, que centralizará as informações fornecidas pelos órgãos do Poder Judiciário.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 3º O Juízo responsável pela execução das sentenças condenatórias das ações de improbidade administrativa, nos termos da Lei 8.429/92, de 02 de junho de 1992, fornecerá ao Conselho Nacional de Justiça, por meio eletrônico, as informações necessárias sobre os processos já transitados em julgados.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 4º O registro decorrente do artigo 3º desta Resolução será excluído, automaticamente, pelo DPJ, após decorrido o prazo previamente estabelecido no ato judicial.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Em 2008, por meio da resolução 50/08, o CNCIA passa por duas grandes mudanças. A partir daí, o cadastro só pode ser acessado por órgãos públicos ou pra fins de pesquisa e as informações passaram a ser cadastradas pelos próprios tribunais. Nos termos da resolução 50/08:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 5º - O acesso ao conteúdo dos dados do Cadastro Nacional de Condenados por ato de Improbidade Administrativa se restringirá aos órgãos públicos, mediante solicitação de informações ao Conselho Nacional de Justiça ou convênio a ser firmado para livre acesso a pesquisa no sistema. (Redação dada pela Resolução nº 50, de 25 de março de 2008)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 4º - A inclusão, alteração e exclusão de dados no sistema, decorrentes do artigo 3º desta Resolução, serão de responsabilidade do juízo de execução da sentença condenatória das ações de improbidade administrativa. (Redação dada pela Resolução nº 50, de 25 de março de 2008)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Em 2013, o CNCIA foi reformulado mais uma vez. Ao contrário da mudança que ocorreu em 2008, dessa vez o escopo do cadastro também foi modificado. A ferramenta passou a chamar-se Cadastro Nacional de Condenações Cíveis por Ato de Improbidade Administrativa e Inelegibilidade (CNCIAI) e o artigo 1º foi modificado para incluir atos, definitivos ou não, que ocasionem a inelegibilidade do réu, como tráfico de drogas e estupros. Além disso, o acesso voltou a ser aberto ao público.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Art. 1º Instituir o Cadastro Nacional de Condenados por Ato de Improbidade Administrativa e por Ato que implique Inelegibilidade - CNCIAI, o qual reunirá as informações do Poder Judiciário sobre pessoas físicas e jurídicas definitivamente condenadas por atos de improbidade no Brasil, nos termos da Lei 8.429, de 2 de junho de 1992, e por atos que ocasionem a inelegibilidade do réu, nos termos da Lei Complementar nº 64, de 18 de maio de 1990. (Redação dada pela Resolução nº 172, de 8 de março de 2013).&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;A mistura de sentenças definitivas e sentenças não definitivas deixou o CNCIA (agora CNCIAI) mais confuso. A primeira confusão surge da renomeação infeliz: mesmo que o segundo C esteja represente palavra &lt;em&gt;cível&lt;/em&gt;, o CNCIAI é quase 100% criminal. Crimes hediondos ou relacionados ao tráfico são algumas das formas de se tornar inelegível, e o número de pessoas punidas com essa condição ultrapassa largamente o número de condenados por improbidade administrativa.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p1 &amp;lt;- tidy_cnc %&amp;gt;%
+  distinct(n_processo, .keep_all = T) %&amp;gt;% 
+  filter(dt_pena &amp;gt; min(dt_cadastro)) %&amp;gt;% 
+  mutate(ano = year(dt_cadastro),
+         assunto_penal_any = ifelse(assunto_penal_any, &amp;quot;Sim&amp;quot;, &amp;quot;Não&amp;quot;)) %&amp;gt;% 
+  group_by(ano) %&amp;gt;% 
+  count(assunto_penal_any) %&amp;gt;% 
+  ggplot(aes(x = ano, y = n)) +
+  geom_bar(aes(fill = assunto_penal_any), stat = &amp;#39;identity&amp;#39;, position = &amp;#39;dodge&amp;#39;) +
+  theme_bw(15) +
+  theme(legend.position = &amp;#39;bottom&amp;#39;) +
+  scale_fill_hue(name = &amp;quot;O processo é criminal?\n&amp;quot;) +
+  scale_x_continuous(breaks = 2007:2015) +
+  xlab(&amp;quot;Ano de cadastro&amp;quot;) +
+  ylab(&amp;quot;Contagem&amp;quot;)
+
+p2 &amp;lt;- tidy_cnc %&amp;gt;%
+    distinct(n_processo, .keep_all = T) %&amp;gt;% 
+    filter(dt_pena &amp;gt; min(dt_cadastro)) %&amp;gt;% 
+    mutate(ano = year(dt_cadastro),
+           assunto_penal_any = ifelse(assunto_penal_any, &amp;quot;Sim&amp;quot;, &amp;quot;Não&amp;quot;)) %&amp;gt;% 
+    group_by(ano) %&amp;gt;% 
+    count(tipo_pena) %&amp;gt;% 
+    ggplot(aes(x = ano, y = n)) +
+    geom_bar(aes(fill = tipo_pena), stat = &amp;#39;identity&amp;#39;, position = &amp;#39;dodge&amp;#39;) +
+    theme_bw(15) +
+    theme(legend.position = &amp;#39;bottom&amp;#39;) +
+    scale_fill_hue(name = &amp;quot;Tipo de condenação\n&amp;quot;) +
+    scale_x_continuous(breaks = 2007:2015) +
+    xlab(&amp;quot;Ano de cadastro&amp;quot;) +
+  ylab(&amp;quot;Contagem&amp;quot;)
+
+p1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://abjur.github.io/inacSite/metodologia/index_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Embora seja importante identificar o aumento no número de condenações criminais cadastradas, a confusão com o nome do cadastro é menos grave do que preocupações relacionadas à procedência dos dados. O Artigo 1º da resolução 172 de 2013 é claro sobre o escopo da base:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Pessoas condenadas &lt;em&gt;definitivamente&lt;/em&gt; por atos de improbidade administrativa&lt;/li&gt;
+&lt;li&gt;Pessoas condenadas à inelegibilidade.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;A ausiência de “definitivamente” no segundo ponto dá a entender que as condenações desse tipo devem ser cadastradas mesmo quando forem &lt;em&gt;não&lt;/em&gt;-definitivas (passíveis de recurso). Por isso espera-se que, quando separarmos os códigos de acordo com “definitividade” da sentença e tipo de crime (improbidade não improbidade), nossas contagens respeitem a esse diagrama:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tipo_processo &amp;lt;- c(&amp;quot;Improbidade com pena de Inelegibilidade&amp;quot;,
+                   &amp;quot;Improbidade sem pena de Inelegibilidade&amp;quot;,
+                   &amp;quot;Outros tipos com pena de Inelegibilidade&amp;quot;,
+                   &amp;quot;Outros tipos sem pena de Inelegibilidade&amp;quot;)
+
+data_frame(`Tipo de Processo` = tipo_processo, `Sentença Definitiva` = c(&amp;quot;&amp;gt;=0&amp;quot;,&amp;quot;&amp;gt;=0&amp;quot;,&amp;quot;&amp;gt;=0&amp;quot;,&amp;quot;=0&amp;quot;), `Sentença Não Definitiva` = c(&amp;quot;&amp;gt;=0&amp;quot;,&amp;quot;=0&amp;quot;,&amp;quot;&amp;gt;=0&amp;quot;,&amp;quot;=0&amp;quot;)) %&amp;gt;% 
+  knitr::kable(caption = &amp;quot;O que espera-se encontrar no CNCIAI quando separarmos as condenações por tipo de processo e tipo de sentença.&amp;quot;, table.attr = &amp;quot;class=&amp;#39;table table-hover&amp;#39;&amp;quot;, format = &amp;#39;html&amp;#39;)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+&lt;span id=&#34;tab:unnamed-chunk-4&#34;&gt;Table 1: &lt;/span&gt;O que espera-se encontrar no CNCIAI quando separarmos as condenações por tipo de processo e tipo de sentença.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Tipo de Processo
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Sentença Definitiva
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Sentença Não Definitiva
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Improbidade com pena de Inelegibilidade
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+&amp;gt;=0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+&amp;gt;=0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Improbidade sem pena de Inelegibilidade
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+&amp;gt;=0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+=0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros tipos com pena de Inelegibilidade
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+&amp;gt;=0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+&amp;gt;=0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros tipos sem pena de Inelegibilidade
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+=0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+=0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Entretanto, as contagens encontradas frustram às nossas expectativas.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_cnc %&amp;gt;% 
+  count(tipo_pena, teve_inelegivel) %&amp;gt;% 
+  spread(teve_inelegivel, n) %&amp;gt;% 
+  setNames(c(&amp;quot;Tipo de condenação&amp;quot;, &amp;quot;Sem inelegibilidade&amp;quot;, &amp;quot;Com inelegibilidade&amp;quot;)) %&amp;gt;% 
+  knitr::kable(caption = &amp;quot;Contagem de condenações por tipo de condenação e por inelegibilidade do réu.&amp;quot;, format = &amp;#39;html&amp;#39;, table.attr = &amp;quot;class=&amp;#39;table table-hover&amp;#39;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+&lt;span id=&#34;tab:unnamed-chunk-5&#34;&gt;Table 2: &lt;/span&gt;Contagem de condenações por tipo de condenação e por inelegibilidade do réu.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Tipo de condenação
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Sem inelegibilidade
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Com inelegibilidade
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Órgão colegiado
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+938
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+21371
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Trânsito em julgado
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+4814
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+8854
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Considerando a inconsistência que acabamos de identificar, resta saber qual é o mecanismo de cadastro que produziu essas contagens. Novamente recorrendo à redação da resolução 172, identificamos que a mudança de 2008 continua: os responsáveis pelo cadastro de informações são os próprios tribunais responsáveis pela condenação.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tidy_improb &amp;lt;- tidy_cnc %&amp;gt;% 
+  filter(!assunto_penal_any, tipo_pena == &amp;quot;Trânsito em julgado&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;!--todo: terminar esse texto de forma coesa--&gt;
+&lt;div id=&#34;coleta&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Coleta&lt;/h2&gt;
+&lt;p&gt;Coletamos no total quatro bases de dados relacionais utilizando raspagem de dados (&lt;em&gt;web scraping&lt;/em&gt;). Essa técnica consiste em construir um robô que acessa automaticamente diversas páginas da web e salva os dados obtidos em um computador.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;condenacoes&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Condenações&lt;/h2&gt;
+&lt;p&gt;A base de condenações foi obtida em dois passos: primeiro baixamos as páginas e depois baixamos as condenações.&lt;/p&gt;
+&lt;div id=&#34;paginas-de-busca&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Páginas de busca&lt;/h3&gt;
+&lt;p&gt;A primeira base baixada são as paginações da pesquisa. Acesse &lt;a href=&#34;http://www.cnj.jus.br/improbidade_adm/consultar_requerido.php?validar=form&amp;amp;rs=pesquisarRequeridoGetTabela&amp;amp;rst=&amp;amp;rsrnd=0&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=&amp;amp;rsargs%5B%5D=I&amp;amp;rsargs%5B%5D=0&amp;amp;rsargs%5B%5D=POSICAO_INICIAL_PAGINACAO_PHP1&amp;amp;rsargs%5B%5D=QUANTIDADE_REGISTROS_PAGINACAO15&#34;&gt;este link&lt;/a&gt; para verificar o conteúdo de uma página. O resultado final dessa extração é uma base de dados em que cada linha é um resultado da busca indicando uma combinação de “pessoa” e “processo”, e com as seguintes colunas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;arq&lt;/code&gt;: nome do arquivo baixado, que representa uma página da pesquisa.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_pag&lt;/code&gt;: id da condenação (1 a 15 condenações), que se repete por página.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_condenacao&lt;/code&gt;: id da condenação (são os números finais de &lt;code&gt;link_condenacao&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_processo&lt;/code&gt;: id do processo (são os números finais de &lt;code&gt;link_processo&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lab_pessoa&lt;/code&gt;: nome da pessoa (ou empresa) envolvida na condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;lab_processo&lt;/code&gt;: número do processo.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;link_condenacao&lt;/code&gt;: link para acesso a mais informações da condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;link_processo&lt;/code&gt;: link para acesso a mais informações do processo.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A base de páginas será incorporada à base de condenações descrita a seguir.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;dados-sobre-condenacoes&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Dados sobre condenações&lt;/h3&gt;
+&lt;p&gt;A segunda base é obtida dos links das condenações. Acesse &lt;a href=&#34;http://www.cnj.jus.br/improbidade_adm/visualizar_condenacao.php?seq_condenacao=10008&#34;&gt;este link&lt;/a&gt; para um exemplo. Após arrumar os dados, ficamos com uma base em que cada uma das 35.977 linhas é uma &lt;strong&gt;condenação&lt;/strong&gt; e com as seguintes 38 colunas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Metadados e identificadores:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;arq_pag&lt;/code&gt;: arquivo que contém a página de pesquisa de onde foi obtido o link da condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_pag&lt;/code&gt;: id da condenação (1 a 15 condenações), que repete por página.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;arq&lt;/code&gt;: arquivo que contém a página HTML com os dados da condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_condenacao&lt;/code&gt;: id único da condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_processo&lt;/code&gt;: id único do processo.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_pessoa&lt;/code&gt;: id único da pessoa.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Informações básicas:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;tipo_pena&lt;/code&gt;: Trânsito em Julgado ou Órgão colegiado.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dt_pena&lt;/code&gt;: Data da pena.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cod_assunto_[1:5]&lt;/code&gt;: códigos dos assuntos (entre 1 e 5 assuntos) da condenação.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nm_assunto_[1:5]&lt;/code&gt;: nomes dos assuntos (entre 1 e 5 assuntos) da condenação.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Inelegibilidade:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_inelegivel&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Perda de Emprego/Cargo/Função Pública:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_perda_cargo&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Pagamento de multa:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_multa&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vl_multa&lt;/code&gt;: valor da multa em reais.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Ressarcimento integral do dano:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_ressarcimento&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vl_ressarcimento&lt;/code&gt;: valor da multa em reais.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Perda de bens ou valores acrescidos ilicitamente ao patrimônio:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_perda_bens&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vl_perda_bens&lt;/code&gt;: valor da multa em reais.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Pena privativa de liberdade:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_pena&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;duracao_pena&lt;/code&gt;: duração em dias.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;de_pena&lt;/code&gt;: data de início.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ate_pena&lt;/code&gt;: data do fim (pode ser no futuro).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Suspensão dos Direitos Políticos:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_suspensao&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;duracao_suspensao&lt;/code&gt;: duração em dias.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;de_suspensao&lt;/code&gt;: data de início.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ate_suspensao&lt;/code&gt;: data do fim (pode ser no futuro).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Proibição de Contratar com o Poder Público ou receber incentivos fiscais ou creditícios, direta ou indiretamente, ainda que por intermédio de pessoa jurídica da qual seja sócio majoritário:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;teve_proibicao&lt;/code&gt;: sim ou vazio.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;duracao_proibicao&lt;/code&gt;: duração em dias.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;de_proibicao&lt;/code&gt;: data de início.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ate_proibicao&lt;/code&gt;: data do fim (pode ser no futuro).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- #### Inconsistências --&gt;
+&lt;!-- Essa base de dados possui algumas inconsistências. A principal delas é que temos 126  condenações (com id&#39;s distintos) que mostram mesmo nome e mesmo número de processo. Intuitivamente, uma pessoa pode estar envolvida em muitos processos e um processo pode envolver muitas pessoas, mas não deveríamos ter repetições de pessoas e processos. Provavelmente o que ocorreu foi o cadastro duplicado da condenação nesses casos. Os casos inconsistentes foram apresentados abaixo. Clique no link para verificar. --&gt;
+&lt;!-- ```{r echo=FALSE} --&gt;
+&lt;!-- cnc_pags %&gt;%  --&gt;
+&lt;!--   tidy_pags() %&gt;%  --&gt;
+&lt;!--   get_dupes(lab_pessoa, lab_processo) %&gt;%  --&gt;
+&lt;!--   select(-dupe_count, -arq, -starts_with(&#39;id&#39;)) %&gt;%  --&gt;
+&lt;!--   mutate_at(vars(starts_with(&#39;link&#39;)),  --&gt;
+&lt;!--             funs(sprintf(l, ., str_extract(., &#39;[0-9]+$&#39;)))) %&gt;%  --&gt;
+&lt;!--   DT::datatable(escape = FALSE) --&gt;
+&lt;!-- ``` --&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;processos&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Processos&lt;/h2&gt;
+&lt;p&gt;Em seguida, obtivemos os dados de todos os processos. Após arrumar os dados, ficamos com 26.825 processos e com as seguintes 10 colunas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;arq_processo&lt;/code&gt;: nome do arquivo (contém o id que aparece no link da base &lt;code&gt;cnc_pags&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_processo&lt;/code&gt;: código identificador do processo.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dt_cadastro&lt;/code&gt;: data de cadastro do processo no sistema.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;n_processo&lt;/code&gt;: número identificador do processo.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;esfera_processo&lt;/code&gt;: estadual, federal, militar ou superior.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tribunal&lt;/code&gt;: nome do tribunal.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;instancia&lt;/code&gt;: primeiro grau, segundo grau, militar ou superior.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;comarca_secao&lt;/code&gt;: nome da comarca ou seção (aplicável somente ao primeiro grau).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vara_camara&lt;/code&gt;: nome da vara (primeiro grau) ou câmara/seção de julgamento (segundo grau ou militar).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dt_propositura&lt;/code&gt;: data de propositura da ação.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A base apresenta apenas duas inconsistências. A primeira é de um único caso que não apresenta informações em geral. A segunda são 60 casos com duas linhas cada e com números de processos idênticos na mesma instância, que podem ser cadastros duplicados.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;pessoas&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Pessoas&lt;/h2&gt;
+&lt;p&gt;Finalmente, a base de pessoas é obtida a partir de links identificados nas páginas de condenações. Cada uma das 30.541 linhas corresponde a uma pessoa (física ou jurídica), com as seguintes colunas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Identificadores:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;arq_pessoa&lt;/code&gt;: nome do arquivo que contém as informações.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;id_pessoa&lt;/code&gt;: id da pessoa (para juntar com a base de condenações).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Informações básicas:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;tipo_pessoa&lt;/code&gt;: F = física e J = jurídica.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nm_pessoa&lt;/code&gt;: Nome da pessoa.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sexo&lt;/code&gt;: F = feminino e M = masculino.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;publico&lt;/code&gt;: S = funcionário público; N = não é funcionário público.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;Informações de funcionários públicos:
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;esfera&lt;/code&gt;: F = Federal, D = Distrital, E = Estadual, M = Municipal.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;orgao&lt;/code&gt;: órgão que a pessoa trabalha (prefeitura, tribunal etc).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cargo&lt;/code&gt;: cargo que a pessoa exerce (prefeito, servidor etc).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;uf&lt;/code&gt;:.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cod&lt;/code&gt;: código interno da pessoa (provavelmente não será utilizado).&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A base apresenta algumas inconsistências. Primeiramente, temos 826 pessoas classificadas como pessoa física, mas sem informação de sexo. Além disso, temos 11 casos de pessoas classificadas como pessoa jurídica e que constam como funcionárias públicas. Dentre as 6930 pessoas classificadas como funcionárias públicas, temos 109 vazios na esfera, 343 vazios no órgão, 474 vazios no cargo e 16 vazios na UF.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;base-unificada&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Base unificada&lt;/h2&gt;
+&lt;p&gt;Para facilitar as análises, construímos também uma base unificada, contendo todas as informações de condenações, pessoas e processos. Nessa base, informações sobre pessoas e processos aparecem duplicadas quando fazem parte de mais de uma condenação. A base possui 35.977 linhas (a mesma quantidade da base de condenações) e 57 colunas.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;proximos-passos&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Próximos passos&lt;/h2&gt;
+&lt;p&gt;Com a base de dados baixada e arrumada, passaremos a realizar diversas análises no cadastro de condenados. As análises abordarão sobre valores envolvidos, pessoas condenadas e características dos processos.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Metodologia</title>
+      <link>https://abjur.github.io/inacSite/metodologia/</link>
+      <pubDate>Sat, 05 Nov 2016 21:05:33 +0530</pubDate>
+      
+      <guid>https://abjur.github.io/inacSite/metodologia/</guid>
       <description>
 
 &lt;pre&gt;&lt;code&gt;multiplot &amp;lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
