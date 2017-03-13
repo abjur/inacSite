@@ -392,17 +392,16 @@ p_relativo <- tidy_ressarcimento_sem_estranhos %>%
 p_absoluto
 ```
 
-<!--A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.
+<!--A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.-->
 
 ```{r}
-tidy_ressarcimento_sem_estranhos %>%
-    mutate(id = uf_processo_consolidado) %>%
-    group_by(id) %>%
-    summarise(vl_ressarcimento = sum(vl_ressarcimento),
-              total = n()) %>% 
-  DT::datatable()
+# tidy_ressarcimento_sem_estranhos %>%
+#    mutate(id = uf_processo_consolidado) %>%
+#    group_by(id) %>%
+#    summarise(vl_ressarcimento = sum(vl_ressarcimento),
+#              total = n()) %>% 
+#  DT::datatable()
 ```
-<!---->
 
 
 Ao contrário do valor absoluto, a taxa de ressarcimento por habitante cresce do Sul para o Norte. A região com maior número de taxas acima de R$5/habitante é a região Norte, que conta com Rondônia, Acre e Roraima, os estados de maior taxa, mas a Região Nordeste também se destaca.
