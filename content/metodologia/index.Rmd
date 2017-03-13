@@ -149,7 +149,7 @@ tidy_cnc %>%
   count(tipo_pena, teve_inelegivel) %>% 
   spread(teve_inelegivel, n) %>% 
   setNames(c("Tipo de condenação", "Sem inelegibilidade", "Com inelegibilidade")) %>% 
-  DT::datatable(caption = "Contagem de condenações por tipo de condenação e por inelegibilidade do réu.")
+  knitr::kable(caption = "Contagem de condenações por tipo de condenação e por inelegibilidade do réu.", format = 'html', table.attr = "class='table table-hover'")
 ```
 
 Considerando a inconsistência que acabamos de identificar, resta saber qual é o mecanismo de cadastro que produziu essas contagens. Novamente recorrendo à redação da resolução 172, identificamos que a mudança de 2008 continua: os responsáveis pelo cadastro de informações são os próprios tribunais responsáveis pela condenação.
