@@ -8,14 +8,195 @@ draft: false
 weight: 0
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-httr::GET('https://raw.githubusercontent.com/abjur/inacBook/master/index.Rmd', 
-          httr::write_disk('temp.Rmd'))
+```{r}
+library(tidyverse)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+
+data(tidy_cnc, package = 'cnc')
+data(br_uf_map, package = 'abjData')
+data(cadmun, package = 'abjData')
+data(pnud_uf, package = 'abjData')
+
+cadmun %<>% distinct(cod, uf) %>% mutate_all(as.character)
+pnud_uf %<>% filter(ano == 2010) %>% 
+  select(uf, ufn, popt) %>% 
+  mutate(uf = as.character(uf)) %>% 
+  inner_join(cadmun, c('uf' = 'cod')) %>% 
+  select(id = uf.y, ufn, popt)
+
+tidy_improb <- tidy_cnc %>% 
+  filter(tipo_pena == "Trânsito em julgado",
+         !assunto_penal_any, 
+         year(dt_pena) >= 2009,
+         year(dt_pena) <= 2015,
+         vl_ressarcimento <= 5.877361e+07)
+
+project_dir <- normalizePath("../..")
+
+source(sprintf("%s/R/add_uf_consolidado.R", project_dir))
 ```
 
-```{r child = 'temp.Rmd'}
+Os cadastrados do CNIA podem sofrer 7 tipos de punição.
+
+- Inelegibilidade.
+- Multa.
+- Pena privativa de liberdade.
+- Perda de bens ou valores acrescidos ilicitamente ao patrimônio.
+- Perda de Cargo/Emprego/Função Pública.
+- Ressarcimento integral do Dano.
+- Suspensão dos Direitos Políticos.
+- Proibição de Contratar com o Poder Público ou receber incentivos fiscais ou creditícios, direta ou indiretamente, ainda que por intermédio de pessoa jurídica da qual seja sócio majoritário.
+
+```{r}
+tidy_improb %>% 
+  mutate(teve_ressarcimento = vl_ressarcimento > 0) %>% 
+  ungroup() %>% 
+  select(dplyr::contains("teve")) %>% 
+  gather(tipo_pena, teve) %>% 
+  group_by(tipo_pena) %>% 
+  count(teve) %>% 
+  arrange(tipo_pena, teve) %>% 
+  summarise(prop = n[length(n)]/sum(n, na.rm = T)) %>% 
+  mutate(tipo_pena2 = str_to_title(str_extract(tipo_pena,"[a-z]+$"))) %>% 
+  ungroup() %>% 
+  mutate(tipo_pena2 = fct_reorder(tipo_pena2, -prop)) %>% 
+  ggplot(aes(x = tipo_pena2, y = prop)) +
+  geom_bar(stat = 'identity', fill = 'royalblue', color = 'black') +
+  theme_bw(15) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.65)) +
+  scale_y_continuous(labels = scales::percent, minor_breaks = seq(.1, .7, .1)) +
+  ylab("Proporção\nde aplicações") +
+  xlab("Tipo de punição")
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-file.remove('temp.Rmd')
+### Punições versus Assuntos
+
+```{r}
+tidy_improb %>%
+  mutate(assunto_nm_1 = fct_lump(assunto_nm_1,
+                                 prop = 0.05,
+                                 other_level = "Outros") %>% 
+           str_to_title()) %>% 
+  ungroup() %>% 
+  filter(vl_ressarcimento > 0, teve_ressarcimento) %>%
+  gather(key, val, starts_with('teve_')) %>%
+  count(assunto_nm_1, key, val) %>%
+  group_by(assunto_nm_1, key) %>% 
+  summarise(prop = val[length(n)]*n[length(n)]/sum(n)) %>% 
+  ungroup() %>%
+  mutate(key = str_to_title(str_extract(key, "[a-z]+$")),
+         assunto = str_extract(assunto_nm_1, "^[A-Za-z]+"), 
+         key = fct_reorder(key,-prop,mean)) %>%
+  ggplot(aes(x = key, y = prop, fill = key)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  #geom_point() +
+  theme_bw(15) +
+  xlab("Quantil do ressarcimento") +
+  ylab("Proporção de condenações") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_colour_hue(name = 'Punição') +
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~assunto)
 ```
+
+### Punições versus Danos
+
+```{r}
+tidy_improb %>%
+  ungroup() %>% 
+  filter(vl_ressarcimento > 0, teve_ressarcimento) %>%
+  mutate(vl_ressarcimento_class = cut(vl_ressarcimento, quantile(vl_ressarcimento,cumsum(c(0,rep(0.1,10)))), labels = F)) %>%
+  gather(key, val, starts_with('teve_')) %>%
+  filter(val) %>%
+  group_by(vl_ressarcimento_class) %>%
+  mutate(total = sum(key=="teve_ressarcimento")) %>%
+  group_by(vl_ressarcimento_class, key) %>%
+  summarise(n = n(), total = total[1]) %>% 
+  mutate(prop = n / total) %>%
+  ungroup() %>%
+  mutate(vl_ressarcimento_class = as.numeric(vl_ressarcimento_class),
+         key = str_to_title(str_extract(key, "[a-z]+$")),
+         key = fct_reorder(key,-prop,mean)) %>%
+  filter(prop < 1) %>% 
+  ggplot(aes(x = vl_ressarcimento_class, y = prop, col = key)) +
+  geom_smooth(alpha = 0) +
+  #geom_point() +
+  theme_bw(15) +
+  xlab("Quantil do ressarcimento") +
+  ylab("Proporção de condenações") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(breaks = 1:10) +
+  scale_colour_hue(name = 'Punição')
+```
+
+### Punições versus Pessoas
+
+```{r}
+tidy_improb %>%
+  mutate(teve_ressarcimento = vl_ressarcimento > 0) %>% 
+  select(starts_with("teve_"), tipo_pessoa) %>% 
+  gather(tipo_pena, teve, starts_with('teve_')) %>%
+  filter(tipo_pena != "teve_pena") %>% 
+  mutate(tipo_pena = str_to_title(str_extract(tipo_pena, '[a-z]+$'))) %>% 
+  count(tipo_pessoa, tipo_pena, teve) %>%
+  group_by(tipo_pessoa, tipo_pena) %>% 
+  summarise(prop = n[2] / sum(n)) %>%
+  ungroup() %>% 
+  arrange(tipo_pessoa, desc(prop)) %>% 
+  mutate(key = fct_reorder(tipo_pena, prop, first, .desc = TRUE)) %>% {
+    ggplot(., aes(x = tipo_pessoa, y = prop)) +
+      geom_col(aes(fill = tipo_pena), 
+               position = 'dodge') +
+      scale_fill_hue(name = 'Tipo de pessoa') +
+      scale_y_continuous(labels = scales::percent) +
+      theme_bw(14) +
+      theme(axis.text.x = element_text(angle = 0, hjust = 1))
+    }
+```
+
+### Probabilidades
+
+```{r}
+#source()
+```
+

@@ -1,11 +1,13 @@
 ---
 title: "Danos"
 author: "Frida Gomam"
-image: "img/portfolio/a4-paper.jpg"
 date: 2015-07-23T21:13:14-05:00
+image: "img/portfolio/a4-paper.jpg"
 categories: ["R"]
+tags: ["oi"]
 draft: false
 weight: 0
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -50,7 +52,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F, warning = F)
 
 data(tidy_cnc, package = 'cnc')
 data(br_uf_map, package = 'abjData')
@@ -93,9 +95,9 @@ tidy_ressarcimento_ano <- tidy_ressarcimento_sem_estranhos %>%
 
 ```
 
-### Tamanho dos danos
+Todo os anos, em média `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são condenadas por improbidade administrativa no Brasil. Aproximadamente `r scales::percent(nrow(tidy_ressarcimento)/nrow(tidy_improb))` dos condenados são obrigados a ressarcir integralmente os danos causados, que ao longo da história do CNIA já somam `r round(sum(tidy_ressarcimento_ano$ress)/10^6,0)` milhões de reais. Só em 2013 e 2014, a justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.
 
-Todo os anos, `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são condenadas por improbidade administrativa no Brasil. Aproximadamente `r scales::percent(nrow(tidy_ressarcimento)/nrow(tidy_improb))` desses condenados são obrigados a ressarcir integralmente os danos causados, que ao longo da história do CNIA já somam `r round(sum(tidy_ressarcimento_ano$ress)/10^6,0)` milhões de reais. Só em 2013 e 2014, a justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.
+<!--more-->
 
 <!-- ### Tendência -->
 
@@ -106,7 +108,7 @@ Todo os anos, `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são con
 tidy_ressarcimento_ano %>%
   filter(ano >= 2009) %>% 
   ggplot(aes(x = ano, y = round(ress/10^6))) +
-  geom_bar(fill = 'royalblue', stat = 'identity', color = 'black') + 
+  geom_bar(fill = '#fbb924', stat = 'identity', color = 'black') + 
   theme_bw(15) +
   scale_x_continuous(breaks = min(tidy_ressarcimento_ano$ano):max(tidy_ressarcimento_ano$ano)) +
   ylab("Ressarcimento cadastrado até\no momento (MM R$)") + 
@@ -125,13 +127,13 @@ tidy_ressarcimento_sem_estranhos %>%
          x = round(x/10^3, 0)) %>% 
   spread(names, x) %>% 
   mutate(`100%` = round(`100%`, 0)) %>% 
-  setNames(c("Ano", "Mínimo","1º Quartil","Mediana","3º Quartil","Máximo (MM R$)")) %>% 
-  DT::datatable(caption = "Estatísticas descritivas dos ressarcimentos do CNIA em milhares de reais.")
+  setNames(c("Ano", "Mínimo","1º Quartil","Mediana","3º Quartil","Máximo")) %>% 
+  knitr::kable(caption = "Estatísticas descritivas dos ressarcimentos do CNIA em milhares de reais.", format = 'html', table.attr = "class='table table-hover'")
 ```
 
 ### Tipos de condenação
 
-As condenações estão dividas nos vários tipos de improbidade previstos pela Lei 8.429/92. Visualiando os ressarcimentos de danos em cada tipo de improbidade concluímos que a 511 milhões de reais foram ressarcidos em processos por danos ao erário. 
+As condenações estão dividas nos vários tipos de improbidade previstos pela Lei 8429 de 1992. <!--Visualiando os ressarcimentos de danos em cada tipo de improbidade concluímos que a 511 milhões de reais foram ressarcidos em processos por danos ao erário.-->
 
 ```{r}
 tidy_improb %>% 
@@ -142,8 +144,10 @@ tidy_improb %>%
   arrange(desc(n)) %>% 
   mutate(p = scales::percent(n/sum(n))) %>% 
   set_names(c("Motivo da condenação","Frequência","%")) %>% 
-  DT::datatable(caption = "Frequência dos assuntos processuais nas condenações por improbidade admnistrativa.")
+  knitr::kable(caption = "Frequência dos assuntos processuais nas condenações por improbidade admnistrativa.", format = 'html', table.attr = "class='table table-hover'")
 ```
+
+A maior parte dos processos corre com o assunto "Dano ao erário", que são responsáveis por 511 milhões de reais em ressarcimentos, ou 61% do total.
 
 ```{r}
 tidy_improb %>% 
@@ -154,10 +158,9 @@ tidy_improb %>%
   summarise(ress = round(sum(vl_ressarcimento, na.rm = T)/10^6, 0)) %>% 
   arrange(desc(ress)) %>% 
   mutate(p = scales::percent(ress/sum(ress))) %>% 
-  set_names(c("Motivo da condenação","Ressarcimento (MM R$)","%")) %>% 
-  DT::datatable(caption = "Frequência dos assuntos processuais nas condenações por improbidade admnistrativa.")
+  set_names(c("Motivo da condenação","Ressarcimento (MM R\\$$)","%")) %>% 
+  knitr::kable(caption = "Total de ressarcimento por tipo de improbidade admnistrativa em milhões de reais.", format = 'html', table.attr = "class='table table-hover'")
 ```
-
 
 <!-- Excluindo as 6 condenações de 2013 e 2014 listadas abaixo, a discrepância entre os totais ressarcidos nos anos fica menor. Entretanto, ainda identifica-se um aumento no terceiro quartil dos anos de 2013 e 2014. -->
 
@@ -253,19 +256,7 @@ tidy_ressarcimento_ano <- tidy_ressarcimento_sem_estranhos %>%
 
 ### Órgãos afetados
 
-A administração municipal é a que mais sofre com as condenações por improbidade. 381 milhões foram ressarcidos. Mas, como muitos registros não discriminam o órgão dos condenados, então uma outra parte significativa das condenações e dos ressarcimentos não estão associadas a nenhum órgão em particular.
-
-```{r}
-colunas <- c("Órgão", "Número de condenações")
-
-tidy_improb %>% 
-  group_by(novo_orgao) %>% 
-  count() %>%
-  arrange(desc(n)) %>%
-  ungroup() %>% 
-  setNames(colunas) %>%
-  DT::datatable()
-```
+A administração municipal é a que mais sofre com as condenações por improbidade. Juntando os danos causados às prefeituras e aos municípios em geral, o CNIA estima essa perda em 381 milhões de reais.
 
 ```{r}
 colunas <- c("Órgão", "Valor do ressarcimento (MM R$)")
@@ -276,9 +267,24 @@ tidy_improb %>%
   arrange(desc(vl_ressarcimento)) %>%
   ungroup() %>% 
   setNames(colunas) %>%
-  DT::datatable()
+  knitr::kable(caption = "Número de condenações separado por órgão do condenado.",
+              format = 'html', table.attr = "class='table table-hover'")
 ```
 
+Mas, como muitos registros não discriminam o órgão dos condenados, uma parte significativa das condenações não está associada a nenhum órgão em particular.
+
+```{r}
+colunas <- c("Órgão", "Número de condenações")
+
+tidy_improb %>% 
+  group_by(novo_orgao) %>% 
+  count() %>%
+  arrange(desc(n)) %>%
+  ungroup() %>% 
+  setNames(colunas) %>%
+  knitr::kable(caption = "Total de ressarcimentos separado por órgão do condenado.",
+               format = 'html', table.attr = "class='table table-hover'")
+```
 
 <!-- ### Esfera -->
 
@@ -310,8 +316,7 @@ ressarcimento_pj <- tidy_improb %>%
   with(sum(vl_ressarcimento))
 ```
 
-
-`r scales::percent(nro_pessoas_juridicas/nrow(tidy_improb))` dos condenados por improbidade são pessoas jurídicas. Entretanto,`r scales::percent(ressarcimento_pj/sum(tidy_improb$vl_ressarcimento))` do total de ressarcimentos vem de dinheiro de empresas. Isso acontece porque uma condenação de pessoa jurídica rende, em média, R$300.000,00 ao Estado.
+`r scales::percent(nro_pessoas_juridicas/nrow(tidy_improb))` dos condenados por improbidade são pessoas jurídicas. Entretanto, essa proporção não se mantém quando analisamos os ressarcimentos: `r scales::percent(ressarcimento_pj/sum(tidy_improb$vl_ressarcimento))` do total a ser ressarcido vem de empresas. Pessoas juŕidicas, em média, são condenadas a ressarcir o Estado em R$300.000,00. 
 
 ```{r}
 
@@ -321,15 +326,16 @@ tidy_improb %>%
   mutate(tipo_pessoa = ifelse(tipo_pessoa == "J", 
                               "Pessoas\nJurídicas","Pessoas\nFísicas")) %>% 
   ggplot(aes(x = tipo_pessoa, y = vl_ressarcimento)) +
-  geom_bar(fill = 'royalblue', stat = 'identity') +
-  ylab("Ressarcimento médio (MM R$)") +
-  xlab('') +
+  geom_bar(fill = '#fbb924', stat = 'identity', color = 'black') +
+  ylab("Ressarcimento médio (MM R\\$$)") +
+  xlab('#fbb924') +
   theme_bw(15)
 
 ```
 
 ### Distribuição geográfica
 
+A distribuição geográfica dos danos aumenta do norte para o Sul. No Sul e no Sudeste, os ressarcimentos por Estado ultrapassam 25MM, na maioria dos casos. No Nordeste, Roraima se destaca com um ressarcimento comparável ao de São Paulo, mas os estados com ressarcimento maior do qu 25 milhões de reais são mais raros. 
 
 ```{r ress_abs}
 
@@ -357,7 +363,7 @@ p_absoluto <- tidy_ressarcimento_sem_estranhos %>%
     inner_join(br_uf_map) %>% {
       ggplot(.) +
         geom_map(aes(x = long, y = lat, map_id = id, fill = vl_ressarcimento), color = 'gray30', map = ., data = .) +
-        scale_fill_brewer(palette = 'PuRd', breaks = brks, labels = lbs, name = 'Valor do ressarcimento') + 
+        scale_fill_brewer(palette = 'YlOrRd', breaks = brks, labels = lbs, name = 'Valor do ressarcimento') + 
         coord_equal() +
         theme_void()
     }
@@ -379,13 +385,14 @@ p_relativo <- tidy_ressarcimento_sem_estranhos %>%
     inner_join(br_uf_map) %>% {
       ggplot(.) +
         geom_map(aes(x = long, y = lat, map_id = id, fill = vl_ressarcimento), color = 'gray30', map = ., data = .) +
-        scale_fill_brewer(palette = 'PuRd', breaks = brks_tx, labels = lbs_tx, name = 'Ressarcimento per capita \n (R$\\habitante)') + 
+        scale_fill_brewer(palette = 'YlOrRd', breaks = brks_tx, labels = lbs_tx, name = 'Ressarcimento per capita \n (R$ por habitante)') + 
         coord_equal() +
         theme_void()
     }
+p_absoluto
 ```
 
-A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.
+<!--A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.
 
 ```{r}
 tidy_ressarcimento_sem_estranhos %>%
@@ -395,8 +402,12 @@ tidy_ressarcimento_sem_estranhos %>%
               total = n()) %>% 
   DT::datatable()
 ```
+<!---->
+
+
+Ao contrário do valor absoluto, a taxa de ressarcimento por habitante cresce do Sul para o Norte. A região com maior número de taxas acima de R$5/habitante é a região Norte, que conta com Rondônia, Acre e Roraima, os estados de maior taxa, mas a Região Nordeste também se destaca.
 
 ```{r}
-multiplot(p_absoluto, p_relativo)
+p_relativo
 ```
 
