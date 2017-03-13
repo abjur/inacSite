@@ -3,6 +3,7 @@ title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
 googleAnalytics = ""
+ignoreFiles = ["\\.Rmd$"]
 
 [params]
   description = "Describe your website"
