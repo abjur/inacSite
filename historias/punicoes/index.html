@@ -125,22 +125,25 @@
          <div class = titulo-historia><h1>Punicoes</h1>
          </div>
          <div class="conteudo-historia">
-         
-
-<p>author: Frida Gomam
-categories:
-- R
-date: &lsquo;2015-07-23T21:13:14-05:00&rsquo;
-draft: False
-image: &lsquo;img/portfolio/a4-paper.jpg&rsquo;
-title: Punicoes
-weight: 0
-&hellip;</p>
-
-<pre><code>library(tidyverse)
-library(stringr)
-library(lubridate)
-library(forcats)
+         <pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## Loading tidyverse: ggplot2
+## Loading tidyverse: tibble
+## Loading tidyverse: tidyr
+## Loading tidyverse: readr
+## Loading tidyverse: purrr
+## Loading tidyverse: dplyr</code></pre>
+<pre><code>## Conflicts with tidy packages ----------------------------------------------</code></pre>
+<pre><code>## filter(): dplyr, stats
+## lag():    dplyr, stats</code></pre>
+<pre class="r"><code>library(stringr)
+library(lubridate)</code></pre>
+<pre><code>## Loading required package: methods</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     date</code></pre>
+<pre class="r"><code>library(forcats)
 
 multiplot &lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
@@ -150,7 +153,7 @@ multiplot &lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
   numPlots = length(plots)
 
-  # If layout is NULL, then use 'cols' to determine layout
+  # If layout is NULL, then use &#39;cols&#39; to determine layout
   if (is.null(layout)) {
     # Make the panel
     # ncol: Number of columns of plots
@@ -180,16 +183,16 @@ multiplot &lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
 
-data(tidy_cnc, package = 'cnc')
-data(br_uf_map, package = 'abjData')
-data(cadmun, package = 'abjData')
-data(pnud_uf, package = 'abjData')
+data(tidy_cnc, package = &#39;cnc&#39;)
+data(br_uf_map, package = &#39;abjData&#39;)
+data(cadmun, package = &#39;abjData&#39;)
+data(pnud_uf, package = &#39;abjData&#39;)
 
 cadmun %&lt;&gt;% distinct(cod, uf) %&gt;% mutate_all(as.character)
 pnud_uf %&lt;&gt;% filter(ano == 2010) %&gt;% 
   select(uf, ufn, popt) %&gt;% 
   mutate(uf = as.character(uf)) %&gt;% 
-  inner_join(cadmun, c('uf' = 'cod')) %&gt;% 
+  inner_join(cadmun, c(&#39;uf&#39; = &#39;cod&#39;)) %&gt;% 
   select(id = uf.y, ufn, popt)
 
 tidy_improb &lt;- tidy_cnc %&gt;% 
@@ -201,11 +204,8 @@ tidy_improb &lt;- tidy_cnc %&gt;%
 
 project_dir &lt;- normalizePath(&quot;../..&quot;)
 
-source(sprintf(&quot;%s/R/add_uf_consolidado.R&quot;, project_dir))
-</code></pre>
-
+source(sprintf(&quot;%s/R/add_uf_consolidado.R&quot;, project_dir))</code></pre>
 <p>Os cadastrados do CNIA podem sofrer 7 tipos de punição.</p>
-
 <ul>
 <li>Inelegibilidade.</li>
 <li>Multa.</li>
@@ -214,29 +214,25 @@ source(sprintf(&quot;%s/R/add_uf_consolidado.R&quot;, project_dir))
 <li>Perda de Cargo/Emprego/Função Pública.</li>
 <li>Ressarcimento integral do Dano.</li>
 <li>Suspensão dos Direitos Políticos.</li>
-<li>Proibição de Contratar com o Poder Público ou receber incentivos
-fiscais ou creditícios, direta ou indiretamente, ainda que por
-intermédio de pessoa jurídica da qual seja sócio majoritário.</li>
+<li>Proibição de Contratar com o Poder Público ou receber incentivos fiscais ou creditícios, direta ou indiretamente, ainda que por intermédio de pessoa jurídica da qual seja sócio majoritário.</li>
 </ul>
-
-<p><img src="punicoes_files/figure-markdown/unnamed-chunk-2-1.png" alt="" /></p>
-
-<h3 id="punições-versus-assuntos">Punições versus Assuntos</h3>
-
-<p><img src="punicoes_files/figure-markdown/unnamed-chunk-3-1.png" alt="" /></p>
-
-<h3 id="punições-versus-danos">Punições versus Danos</h3>
-
-<pre><code>FALSE Warning: Removed 6 rows containing non-finite values (stat_smooth).
-</code></pre>
-
-<p><img src="punicoes_files/figure-markdown/unnamed-chunk-4-1.png" alt="" /></p>
-
-<h3 id="punições-versus-pessoas">Punições versus Pessoas</h3>
-
-<p><img src="punicoes_files/figure-markdown/unnamed-chunk-5-1.png" alt="" /></p>
-
-<h3 id="probabilidades">Probabilidades</h3>
+<p><img src="/historias/punicoes_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<div id="punicoes-versus-assuntos" class="section level3">
+<h3>Punições versus Assuntos</h3>
+<p><img src="/historias/punicoes_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="punicoes-versus-danos" class="section level3">
+<h3>Punições versus Danos</h3>
+<pre><code>FALSE Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<p><img src="/historias/punicoes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="punicoes-versus-pessoas" class="section level3">
+<h3>Punições versus Pessoas</h3>
+<p><img src="/historias/punicoes_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="probabilidades" class="section level3">
+<h3>Probabilidades</h3>
+</div>
 
          </div>
       </div>
