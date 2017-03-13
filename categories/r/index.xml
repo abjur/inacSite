@@ -14,41 +14,807 @@
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
       <guid>https://abjur.github.io/inacSite/historias/danos/</guid>
-      <description>&lt;div id=&#34;r-markdown&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;R Markdown&lt;/h1&gt;
-&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34; class=&#34;uri&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;You can embed an R code chunk like this:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(cars)
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-fit &amp;lt;- lm(dist ~ speed, data = cars)
-fit
-## 
-## Call:
-## lm(formula = dist ~ speed, data = cars)
-## 
-## Coefficients:
-## (Intercept)        speed  
-##     -17.579        3.932&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;including-plots&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Including Plots&lt;/h1&gt;
-&lt;p&gt;You can also embed plots. See Figure &lt;a href=&#34;#fig:pie&#34;&gt;1&lt;/a&gt; for example:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(0, 1, 0, 1))
-plot(1:10)&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;&lt;span id=&#34;fig:pie&#34;&gt;&lt;/span&gt;
-&lt;img src=&#34;https://abjur.github.io/inacSite/historias/danos_files/figure-html/pie-1.png&#34; alt=&#34;A fancy pie chart.&#34; width=&#34;672&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;
-Figure 1: A fancy pie chart.
-&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</description>
+      <description>&lt;p&gt;always_allow_html: True
+author: Frida Gomam
+categories:
+- R
+date: &amp;lsquo;2015-07-23T21:13:14-05:00&amp;rsquo;
+draft: False
+image: &amp;lsquo;img/portfolio/a4-paper.jpg&amp;rsquo;
+tags:
+- oi
+title: Danos
+weight: 0
+&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Todo os anos, em média 658 pessoas são condenadas por improbidade
+administrativa no Brasil. Aproximadamente 81.5% dos condenados são
+obrigados a ressarcir integralmente os danos causados, que ao longo da
+história do CNIA já somam 835 milhões de reais. Só em 2013 e 2014, a
+justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;!-- ### Tendência --&gt;
+&lt;!-- Essa tendência pode indicar uma maior eficácia no combate à improbidade administrativa, mas também pode indicar uma melhora no cadastramento de informações no CNIA. --&gt;
+&lt;img src=&#34;danos_files/figure-markdown/unnamed-chunk-2-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+Estatísticas descritivas dos ressarcimentos do CNIA em milhares de
+reais.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Ano
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Mínimo
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+1º Quartil
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Mediana
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+3º Quartil
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Máximo
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2009
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+6
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+18
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+83
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+22521
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2010
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+7
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+21
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+70
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+21333
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2011
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+8
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+29
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+92
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+10517
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2012
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+33
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+97
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1826
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2013
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+9
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+38
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+140
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+32606
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2014
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+10
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+43
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+132
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+52046
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2015
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+15
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+44
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+223
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+7771
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;tipos-de-condenação&#34;&gt;Tipos de condenação&lt;/h3&gt;
+
+&lt;p&gt;As condenações estão dividas nos vários tipos de improbidade previstos
+pela Lei 8429 de 1992.
+&lt;!--Visualiando os ressarcimentos de danos em cada tipo de improbidade concluímos que a 511 milhões de reais foram ressarcidos em processos por danos ao erário.--&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+Frequência dos assuntos processuais nas condenações por improbidade
+admnistrativa.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Motivo da condenação
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Frequência
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+%
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Dano Ao Erário
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2169
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+47.1%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Violação Aos Princípios Administrativos
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1331
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+28.9%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Enriquecimento Ilícito
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+475
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+10.3%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Improbidade Administrativa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+315
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+6.8%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Direito Administrativo E Outras Matérias De Direito Público
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+265
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+5.8%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+51
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+1.1%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+A maior parte dos processos corre com o assunto &amp;ldquo;Dano ao erário&amp;rdquo;, que
+são responsáveis por 511 milhões de reais em ressarcimentos, ou 61% do
+total.&lt;/p&gt;
+
+&lt;p&gt;&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+Total de ressarcimento por tipo de improbidade admnistrativa em milhões
+de reais.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Motivo da condenação
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Ressarcimento (MM R\$\$)
+&lt;/th&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+%
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Dano Ao Erário
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+511
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+61.3%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Violação Aos Princípios Administrativos
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+179
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+21.5%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Improbidade Administrativa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+47
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+5.6%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Direito Administrativo E Outras Matérias De Direito Público
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+46
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+5.5%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Enriquecimento Ilícito
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+40
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+4.8%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+11
+&lt;/td&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+1.3%
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- Excluindo as 6 condenações de 2013 e 2014 listadas abaixo, a discrepância entre os totais ressarcidos nos anos fica menor. Entretanto, ainda identifica-se um aumento no terceiro quartil dos anos de 2013 e 2014. --&gt;
+&lt;!-- ```{r} --&gt;
+&lt;!-- tidy_ressarcimento_pos_cnc_sem_estranhos %&gt;%  --&gt;
+&lt;!--   select(dt_pena, vl_ressarcimento) %&gt;% --&gt;
+&lt;!--   top_n(-(3452-6)) %&gt;%  --&gt;
+&lt;!--   mutate(ano = year(dt_pena)) %&gt;%  --&gt;
+&lt;!--   filter(ano &gt;= 2009, ano &lt;= 2015) %&gt;%  --&gt;
+&lt;!--   group_by(ano) %&gt;%  --&gt;
+&lt;!--   summarise(ress = sum(vl_ressarcimento)/10^6) %&gt;% --&gt;
+&lt;!--   ggplot(aes(x = ano, y = ress)) + --&gt;
+&lt;!--    geom_bar(fill = &#39;royalblue&#39;, stat = &#39;identity&#39;, color = &#39;black&#39;) +  --&gt;
+&lt;!--   theme_bw(15) + --&gt;
+&lt;!--   scale_x_continuous(breaks = min(ressarcimentos_por_ano_sem_estranhos$ano):max(ressarcimentos_por_ano_sem_estranhos$ano)) + --&gt;
+&lt;!--   ylab(&#34;Ressarcimento cadastrado até\no momento (MM R$)&#34;) +  --&gt;
+&lt;!--   xlab(&#34;Ano de condenação&#34;) --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ```{r} --&gt;
+&lt;!-- tidy_ressarcimento_pos_cnc_sem_estranhos %&gt;%  --&gt;
+&lt;!--   select(dt_pena, vl_ressarcimento) %&gt;% --&gt;
+&lt;!--   top_n(-(3452-6)) %&gt;%  --&gt;
+&lt;!--   mutate(ano = year(dt_pena)) %&gt;%  --&gt;
+&lt;!--   filter(ano &gt;= 2009, ano &lt;= 2015) %&gt;%  --&gt;
+&lt;!--   group_by(ano) %&gt;%  --&gt;
+&lt;!--   nest(vl_ressarcimento) %&gt;%  --&gt;
+&lt;!--   mutate(qtl = map(data,~broom::tidy(quantile(.x$vl_ressarcimento)))) %&gt;%  --&gt;
+&lt;!--   unnest(qtl) %&gt;%  --&gt;
+&lt;!--   mutate(names = factor(names,c(&#34;0%&#34;,&#34;25%&#34;,&#34;50%&#34;,&#34;75%&#34;,&#34;100%&#34;)), --&gt;
+&lt;!--          x = round(x/10^6, 3)) %&gt;%  --&gt;
+&lt;!--   spread(names, x) %&gt;%  --&gt;
+&lt;!--   setNames(c(&#34;Ano&#34;, &#34;Mínimo&#34;,&#34;1º Quartil&#34;,&#34;2º Quartil&#34;,&#34;3º Quartil&#34;,&#34;Máximo&#34;)) --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ### Órgãos --&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;órgãos-afetados&#34;&gt;Órgãos afetados&lt;/h3&gt;
+
+&lt;p&gt;A administração municipal é a que mais sofre com as condenações por
+improbidade. Juntando os danos causados às prefeituras e aos municípios
+em geral, o CNIA estima essa perda em 381 milhões de reais.&lt;/p&gt;
+
+&lt;p&gt;&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+Número de condenações separado por órgão do condenado.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Órgão
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Valor do ressarcimento (MM R\$)
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Não Identificado
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+314
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Prefeitura
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+287
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Municipio
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+94
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+42
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Caixa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+25
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Vereadores
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+19
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Poder Executivo
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+15
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Inss
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+13
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Policia
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+11
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Secretaria
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+8
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Municipio, Prefeitura
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+3
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Correios
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+2
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Corpo De Bombeiros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Demei
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Assembleia Legislativa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Detran
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Pmsp
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Poder Legislativo
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Vereadores, Municipio
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+0
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+Mas, como muitos registros não discriminam o órgão dos condenados, uma
+parte significativa das condenações não está associada a nenhum órgão em
+particular.&lt;/p&gt;
+
+&lt;p&gt;&lt;table class=&#34;table table-hover&#34;&gt;
+&lt;caption&gt;
+Total de ressarcimentos separado por órgão do condenado.
+&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:left;&#34;&gt;
+Órgão
+&lt;/th&gt;
+&lt;th style=&#34;text-align:right;&#34;&gt;
+Número de condenações
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Prefeitura
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1572
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Não Identificado
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+1445
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Municipio
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+501
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Vereadores
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+349
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Outros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+302
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Secretaria
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+111
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Poder Executivo
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+75
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Correios
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+49
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Caixa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+43
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Inss
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+39
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Municipio, Prefeitura
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+39
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Policia
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+25
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Corpo De Bombeiros
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+11
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Poder Legislativo
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+11
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Vereadores, Municipio
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+10
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Detran
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+8
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Assembleia Legislativa
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+6
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Demei
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:left;&#34;&gt;
+Pmsp
+&lt;/td&gt;
+&lt;td style=&#34;text-align:right;&#34;&gt;
+5
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- ### Esfera --&gt;
+&lt;!-- Com relação às esferas, os danos em sua maior parte vêm da esfera estadual. Entretanto, a proporção de ressarcimentos vinda da esfera federal chega a 37%. --&gt;
+&lt;!-- ```{r} --&gt;
+&lt;!-- tidy_ressarcimento_pos_cnc_sem_estranhos %&gt;%  --&gt;
+&lt;!--   group_by(esfera_processo, tipo_pena) %&gt;%  --&gt;
+&lt;!--   summarise(vl_ressarcimento = sum(vl_ressarcimento)/10^6) %&gt;%  --&gt;
+&lt;!--   spread(tipo_pena, vl_ressarcimento) %&gt;%  --&gt;
+&lt;!--   ungroup() %&gt;%  --&gt;
+&lt;!--   mutate(esfera_processo = str_to_title(esfera_processo)) %&gt;%  --&gt;
+&lt;!--   setNames(c(&#34;Esfera&#34;,colunas[2:3])) %&gt;%  --&gt;
+&lt;!--   knitr::kable() --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ### Tipos de pessoa --&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;pessoas-jurídicas&#34;&gt;Pessoas jurídicas&lt;/h3&gt;
+
+&lt;p&gt;7.08% dos condenados por improbidade são pessoas jurídicas. Entretanto,
+essa proporção não se mantém quando analisamos os ressarcimentos: 12.5%
+do total a ser ressarcido vem de empresas. Pessoas juŕidicas, em média,
+são condenadas a ressarcir o Estado em R\$300.000,00.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;danos_files/figure-markdown/unnamed-chunk-10-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;distribuição-geográfica&#34;&gt;Distribuição geográfica&lt;/h3&gt;
+
+&lt;p&gt;A distribuição geográfica dos danos aumenta do norte para o Sul. No Sul
+e no Sudeste, os ressarcimentos por Estado ultrapassam 25MM, na maioria
+dos casos. No Nordeste, Roraima se destaca com um ressarcimento
+comparável ao de São Paulo, mas os estados com ressarcimento maior do qu
+25 milhões de reais são mais raros.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;danos_files/figure-markdown/ress_abs-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;!--A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.--&gt;
+
+&lt;p&gt;Ao contrário do valor absoluto, a taxa de ressarcimento por habitante
+cresce do Sul para o Norte. A região com maior número de taxas acima de
+R\$5/habitante é a região Norte, que conta com Rondônia, Acre e Roraima,
+os estados de maior taxa, mas a Região Nordeste também se destaca.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;danos_files/figure-markdown/unnamed-chunk-12-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -57,11 +823,27 @@ Figure 1: A fancy pie chart.
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
       <guid>https://abjur.github.io/inacSite/historias/tempos/</guid>
-      <description>&lt;div id=&#34;r-markdown&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;R Markdown&lt;/h1&gt;
-&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34; class=&#34;uri&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
+      <description>
+
+&lt;p&gt;author: Frida Gomam
+categories:
+- R
+date: &amp;lsquo;2015-07-23T21:13:14-05:00&amp;rsquo;
+draft: False
+image: &amp;lsquo;img/portfolio/a4-paper.jpg&amp;rsquo;
+title: Hello R Markdown
+weight: 0
+&amp;hellip;&lt;/p&gt;
+
+&lt;h1 id=&#34;r-markdown&#34;&gt;R Markdown&lt;/h1&gt;
+
+&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
+
 &lt;p&gt;You can embed an R code chunk like this:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(cars)
+
+&lt;pre&gt;&lt;code&gt;summary(cars)
 ##      speed           dist       
 ##  Min.   : 4.0   Min.   :  2.00  
 ##  1st Qu.:12.0   1st Qu.: 26.00  
@@ -77,20 +859,18 @@ fit
 ## 
 ## Coefficients:
 ## (Intercept)        speed  
-##     -17.579        3.932&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;including-plots&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Including Plots&lt;/h1&gt;
-&lt;p&gt;You can also embed plots. See Figure &lt;a href=&#34;#fig:pie&#34;&gt;1&lt;/a&gt; for example:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(0, 1, 0, 1))
-plot(1:10)&lt;/code&gt;&lt;/pre&gt;
-&lt;div class=&#34;figure&#34;&gt;&lt;span id=&#34;fig:pie&#34;&gt;&lt;/span&gt;
-&lt;img src=&#34;https://abjur.github.io/inacSite/historias/tempos_files/figure-html/pie-1.png&#34; alt=&#34;A fancy pie chart.&#34; width=&#34;672&#34; /&gt;
-&lt;p class=&#34;caption&#34;&gt;
-Figure 1: A fancy pie chart.
-&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
+##     -17.579        3.932
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;including-plots&#34;&gt;Including Plots&lt;/h1&gt;
+
+&lt;p&gt;You can also embed plots. See Figure @ref(fig:pie) for example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;par(mar = c(0, 1, 0, 1))
+plot(1:10)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;tempos_files/figure-markdown/pie-1.png&#34; alt=&#34;A fancy pie chart.&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -100,19 +880,118 @@ Figure 1: A fancy pie chart.
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
       <guid>https://abjur.github.io/inacSite/historias/punicoes/</guid>
-      <description>&lt;!-- BLOGDOWN-HEAD --&gt;
-&lt;!-- /BLOGDOWN-HEAD --&gt;
+      <description>
 
-&lt;!-- BLOGDOWN-BODY-BEFORE --&gt;
-&lt;!-- /BLOGDOWN-BODY-BEFORE --&gt;
-&lt;div id=&#34;preambulo&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Preâmbulo&lt;/h1&gt;
-&lt;p&gt;Este é um relatório escrito em &lt;strong&gt;Markdown&lt;/strong&gt; descrevendo um estudo realizado pela Associação Brasileira de Jurimetria (ABJ) para o Instituto Não Aceito Corrupção. O estudo em questão teve a finalidade de compreender o crime de improbidade admnistrativa analisando os admnistradores públicos que constam no Cadastro Nacional de Condenações Cíveis por Ato de Improbidade Administrativa e Inelegibilidade (CNC) do Conselho Nacional de Justiça (CNJ).&lt;/p&gt;
-&lt;p&gt;Para compilar este relatório, você precisará da versão de desenvolvimento do pacote bookdown disponível no Github do rstudio:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;devtools::install_github(&amp;quot;rstudio/bookdown&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Cada arquivo Rmd contém um e apenas um capítulo, e cada capítulo é definido pelo primeiro nível de cabeçalho #.&lt;/p&gt;
-&lt;p&gt;Para compilar este documento em PDF, você precisará utilizar XeLaTeX.&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;author: Frida Gomam
+categories:
+- R
+date: &amp;lsquo;2015-07-23T21:13:14-05:00&amp;rsquo;
+draft: False
+image: &amp;lsquo;img/portfolio/a4-paper.jpg&amp;rsquo;
+title: Punicoes
+weight: 0
+&amp;hellip;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;library(tidyverse)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+multiplot &amp;lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots &amp;lt;- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use &#39;cols&#39; to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout &amp;lt;- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx &amp;lt;- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+
+data(tidy_cnc, package = &#39;cnc&#39;)
+data(br_uf_map, package = &#39;abjData&#39;)
+data(cadmun, package = &#39;abjData&#39;)
+data(pnud_uf, package = &#39;abjData&#39;)
+
+cadmun %&amp;lt;&amp;gt;% distinct(cod, uf) %&amp;gt;% mutate_all(as.character)
+pnud_uf %&amp;lt;&amp;gt;% filter(ano == 2010) %&amp;gt;% 
+  select(uf, ufn, popt) %&amp;gt;% 
+  mutate(uf = as.character(uf)) %&amp;gt;% 
+  inner_join(cadmun, c(&#39;uf&#39; = &#39;cod&#39;)) %&amp;gt;% 
+  select(id = uf.y, ufn, popt)
+
+tidy_improb &amp;lt;- tidy_cnc %&amp;gt;% 
+  filter(tipo_pena == &amp;quot;Trânsito em julgado&amp;quot;,
+         !assunto_penal_any, 
+         year(dt_pena) &amp;gt;= 2009,
+         year(dt_pena) &amp;lt;= 2015,
+         vl_ressarcimento &amp;lt;= 5.877361e+07)
+
+project_dir &amp;lt;- normalizePath(&amp;quot;../..&amp;quot;)
+
+source(sprintf(&amp;quot;%s/R/add_uf_consolidado.R&amp;quot;, project_dir))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Os cadastrados do CNIA podem sofrer 7 tipos de punição.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Inelegibilidade.&lt;/li&gt;
+&lt;li&gt;Multa.&lt;/li&gt;
+&lt;li&gt;Pena privativa de liberdade.&lt;/li&gt;
+&lt;li&gt;Perda de bens ou valores acrescidos ilicitamente ao patrimônio.&lt;/li&gt;
+&lt;li&gt;Perda de Cargo/Emprego/Função Pública.&lt;/li&gt;
+&lt;li&gt;Ressarcimento integral do Dano.&lt;/li&gt;
+&lt;li&gt;Suspensão dos Direitos Políticos.&lt;/li&gt;
+&lt;li&gt;Proibição de Contratar com o Poder Público ou receber incentivos
+fiscais ou creditícios, direta ou indiretamente, ainda que por
+intermédio de pessoa jurídica da qual seja sócio majoritário.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&#34;punicoes_files/figure-markdown/unnamed-chunk-2-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;punições-versus-assuntos&#34;&gt;Punições versus Assuntos&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;punicoes_files/figure-markdown/unnamed-chunk-3-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;punições-versus-danos&#34;&gt;Punições versus Danos&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;FALSE Warning: Removed 6 rows containing non-finite values (stat_smooth).
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;punicoes_files/figure-markdown/unnamed-chunk-4-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;punições-versus-pessoas&#34;&gt;Punições versus Pessoas&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;punicoes_files/figure-markdown/unnamed-chunk-5-1.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;probabilidades&#34;&gt;Probabilidades&lt;/h3&gt;
 </description>
     </item>
     

@@ -15,6 +15,7 @@
 
 <link rel="stylesheet" href="https://abjur.github.io/inacSite/css/bootstrap.min.css">
 <link rel="stylesheet" id="ct-tracks-google-fonts-css" href="//fonts.googleapis.com/css?family=Raleway%3A400%2C700&amp;subset=latin%2Clatin-ext&amp;ver=4.7.2" type="text/css" media="all">
+<link rel="stylesheet" href="https://abjur.github.io/inacSite/css/custom/style.css">
 <link rel="stylesheet" href="https://abjur.github.io/inacSite/css/font-awesome.min.css">
 
 <link href="https://abjur.github.io/inacSite/css/style.default.css" rel="stylesheet" id="theme-stylesheet">
@@ -25,12 +26,12 @@
 
 </head>
   <body>
-<div id="root">
+    <div id="root">
       <div class="container-fluid">
         <div class="row site-header">
           <div class="col-md-12">
             <div class="row">
-              <div class="col-md-12 top-navigation">
+              <div class="col-md-12 top-navigation custom-navbar">
                 <div class="row">
   <div class="col-sm-6">
     <div class="categories-block">
@@ -64,25 +65,6 @@
         <i class="fa fa-instagram"></i>
       </a>
       
-      
-      <a href="mailto:email@example.com" data-animate-hover="pulse" class="email">
-        <i class="fa fa-envelope"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse">
-        <i class="fa fa-linkedin"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20stackoverflow" data-animate-hover="pulse">
-        <i class="fa fa-stack-overflow"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse">
-        <i class="fa fa-github"></i>
-      </a>
       
 
     </div>
@@ -131,7 +113,7 @@
         </div>
 
 
-<div class="col-xs-12 col-sm-12 col-md-8 col-md-offset-2 content-column white-background">
+<div class="col-xs-12 col-sm-12 col-md-8 col-md-offset-2 content-column white-background conteudo">
   <div class="small-navbar visible-xs">
   <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
   <h1 class="small-navbar-heading"><a href="/">Monitor da Improbidade</a></h1>
@@ -139,27 +121,127 @@
 
   
   <div class="row">
-    <div class="col-lg-8 col-md-offset-2">
       <div class="content-column-content">
-         <h1>Punicoes</h1>
-         <!-- BLOGDOWN-HEAD -->
-<!-- /BLOGDOWN-HEAD -->
+         <div class = titulo-historia><h1>Punicoes</h1>
+         </div>
+         <div class="conteudo-historia">
+         
 
-<!-- BLOGDOWN-BODY-BEFORE -->
-<!-- /BLOGDOWN-BODY-BEFORE -->
-<div id="preambulo" class="section level1">
-<h1>Preâmbulo</h1>
-<p>Este é um relatório escrito em <strong>Markdown</strong> descrevendo um estudo realizado pela Associação Brasileira de Jurimetria (ABJ) para o Instituto Não Aceito Corrupção. O estudo em questão teve a finalidade de compreender o crime de improbidade admnistrativa analisando os admnistradores públicos que constam no Cadastro Nacional de Condenações Cíveis por Ato de Improbidade Administrativa e Inelegibilidade (CNC) do Conselho Nacional de Justiça (CNJ).</p>
-<p>Para compilar este relatório, você precisará da versão de desenvolvimento do pacote bookdown disponível no Github do rstudio:</p>
-<pre class="r"><code>devtools::install_github(&quot;rstudio/bookdown&quot;)</code></pre>
-<p>Cada arquivo Rmd contém um e apenas um capítulo, e cada capítulo é definido pelo primeiro nível de cabeçalho #.</p>
-<p>Para compilar este documento em PDF, você precisará utilizar XeLaTeX.</p>
-</div>
+<p>author: Frida Gomam
+categories:
+- R
+date: &lsquo;2015-07-23T21:13:14-05:00&rsquo;
+draft: False
+image: &lsquo;img/portfolio/a4-paper.jpg&rsquo;
+title: Punicoes
+weight: 0
+&hellip;</p>
 
+<pre><code>library(tidyverse)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+multiplot &lt;- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots &lt;- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout &lt;- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx &lt;- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+
+data(tidy_cnc, package = 'cnc')
+data(br_uf_map, package = 'abjData')
+data(cadmun, package = 'abjData')
+data(pnud_uf, package = 'abjData')
+
+cadmun %&lt;&gt;% distinct(cod, uf) %&gt;% mutate_all(as.character)
+pnud_uf %&lt;&gt;% filter(ano == 2010) %&gt;% 
+  select(uf, ufn, popt) %&gt;% 
+  mutate(uf = as.character(uf)) %&gt;% 
+  inner_join(cadmun, c('uf' = 'cod')) %&gt;% 
+  select(id = uf.y, ufn, popt)
+
+tidy_improb &lt;- tidy_cnc %&gt;% 
+  filter(tipo_pena == &quot;Trânsito em julgado&quot;,
+         !assunto_penal_any, 
+         year(dt_pena) &gt;= 2009,
+         year(dt_pena) &lt;= 2015,
+         vl_ressarcimento &lt;= 5.877361e+07)
+
+project_dir &lt;- normalizePath(&quot;../..&quot;)
+
+source(sprintf(&quot;%s/R/add_uf_consolidado.R&quot;, project_dir))
+</code></pre>
+
+<p>Os cadastrados do CNIA podem sofrer 7 tipos de punição.</p>
+
+<ul>
+<li>Inelegibilidade.</li>
+<li>Multa.</li>
+<li>Pena privativa de liberdade.</li>
+<li>Perda de bens ou valores acrescidos ilicitamente ao patrimônio.</li>
+<li>Perda de Cargo/Emprego/Função Pública.</li>
+<li>Ressarcimento integral do Dano.</li>
+<li>Suspensão dos Direitos Políticos.</li>
+<li>Proibição de Contratar com o Poder Público ou receber incentivos
+fiscais ou creditícios, direta ou indiretamente, ainda que por
+intermédio de pessoa jurídica da qual seja sócio majoritário.</li>
+</ul>
+
+<p><img src="punicoes_files/figure-markdown/unnamed-chunk-2-1.png" alt="" /></p>
+
+<h3 id="punições-versus-assuntos">Punições versus Assuntos</h3>
+
+<p><img src="punicoes_files/figure-markdown/unnamed-chunk-3-1.png" alt="" /></p>
+
+<h3 id="punições-versus-danos">Punições versus Danos</h3>
+
+<pre><code>FALSE Warning: Removed 6 rows containing non-finite values (stat_smooth).
+</code></pre>
+
+<p><img src="punicoes_files/figure-markdown/unnamed-chunk-4-1.png" alt="" /></p>
+
+<h3 id="punições-versus-pessoas">Punições versus Pessoas</h3>
+
+<p><img src="punicoes_files/figure-markdown/unnamed-chunk-5-1.png" alt="" /></p>
+
+<h3 id="probabilidades">Probabilidades</h3>
+
+         </div>
       </div>
     </div>
-  </div>
-  
+
   <hr/>
   <div id="disqus_thread"></div>
 <script type="text/javascript">

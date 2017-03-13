@@ -15,6 +15,7 @@
 
 <link rel="stylesheet" href="https://abjur.github.io/inacSite/css/bootstrap.min.css">
 <link rel="stylesheet" id="ct-tracks-google-fonts-css" href="//fonts.googleapis.com/css?family=Raleway%3A400%2C700&amp;subset=latin%2Clatin-ext&amp;ver=4.7.2" type="text/css" media="all">
+<link rel="stylesheet" href="https://abjur.github.io/inacSite/css/custom/style.css">
 <link rel="stylesheet" href="https://abjur.github.io/inacSite/css/font-awesome.min.css">
 
 <link href="https://abjur.github.io/inacSite/css/style.default.css" rel="stylesheet" id="theme-stylesheet">
@@ -25,12 +26,12 @@
 
 </head>
   <body>
-<div id="root">
+    <div id="root">
       <div class="container-fluid">
         <div class="row site-header">
           <div class="col-md-12">
             <div class="row">
-              <div class="col-md-12 top-navigation">
+              <div class="col-md-12 top-navigation custom-navbar">
                 <div class="row">
   <div class="col-sm-6">
     <div class="categories-block">
@@ -64,25 +65,6 @@
         <i class="fa fa-instagram"></i>
       </a>
       
-      
-      <a href="mailto:email@example.com" data-animate-hover="pulse" class="email">
-        <i class="fa fa-envelope"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse">
-        <i class="fa fa-linkedin"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20stackoverflow" data-animate-hover="pulse">
-        <i class="fa fa-stack-overflow"></i>
-      </a>
-      
-      
-      <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse">
-        <i class="fa fa-github"></i>
-      </a>
       
 
     </div>
@@ -131,7 +113,7 @@
         </div>
 
 
-<div class="col-xs-12 col-sm-12 col-md-8 col-md-offset-2 content-column white-background">
+<div class="col-xs-12 col-sm-12 col-md-8 col-md-offset-2 content-column white-background conteudo">
   <div class="small-navbar visible-xs">
   <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
   <h1 class="small-navbar-heading"><a href="/">Monitor da Improbidade</a></h1>
@@ -139,48 +121,815 @@
 
   
   <div class="row">
-    <div class="col-lg-8 col-md-offset-2">
       <div class="content-column-content">
-         <h1>Danos</h1>
-         <div id="r-markdown" class="section level1">
-<h1>R Markdown</h1>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-fit &lt;- lm(dist ~ speed, data = cars)
-fit
-## 
-## Call:
-## lm(formula = dist ~ speed, data = cars)
-## 
-## Coefficients:
-## (Intercept)        speed  
-##     -17.579        3.932</code></pre>
-</div>
-<div id="including-plots" class="section level1">
-<h1>Including Plots</h1>
-<p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
-<pre class="r"><code>par(mar = c(0, 1, 0, 1))
-plot(1:10)</code></pre>
-<div class="figure"><span id="fig:pie"></span>
-<img src="/historias/danos_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
-<p class="caption">
-Figure 1: A fancy pie chart.
-</p>
-</div>
-</div>
+         <div class = titulo-historia><h1>Danos</h1>
+         </div>
+         <div class="conteudo-historia">
+         <p>always_allow_html: True
+author: Frida Gomam
+categories:
+- R
+date: &lsquo;2015-07-23T21:13:14-05:00&rsquo;
+draft: False
+image: &lsquo;img/portfolio/a4-paper.jpg&rsquo;
+tags:
+- oi
+title: Danos
+weight: 0
+&hellip;</p>
 
+<p>Todo os anos, em média 658 pessoas são condenadas por improbidade
+administrativa no Brasil. Aproximadamente 81.5% dos condenados são
+obrigados a ressarcir integralmente os danos causados, que ao longo da
+história do CNIA já somam 835 milhões de reais. Só em 2013 e 2014, a
+justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.</p>
+
+<p>
+<!-- ### Tendência -->
+<!-- Essa tendência pode indicar uma maior eficácia no combate à improbidade administrativa, mas também pode indicar uma melhora no cadastramento de informações no CNIA. -->
+<img src="danos_files/figure-markdown/unnamed-chunk-2-1.png" alt="" /></p>
+
+<p><table class="table table-hover">
+<caption>
+Estatísticas descritivas dos ressarcimentos do CNIA em milhares de
+reais.
+</caption>
+<thead>
+<tr>
+<th style="text-align:right;">
+Ano
+</th>
+<th style="text-align:right;">
+Mínimo
+</th>
+<th style="text-align:right;">
+1º Quartil
+</th>
+<th style="text-align:right;">
+Mediana
+</th>
+<th style="text-align:right;">
+3º Quartil
+</th>
+<th style="text-align:right;">
+Máximo
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+2009
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+83
+</td>
+<td style="text-align:right;">
+22521
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2010
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+70
+</td>
+<td style="text-align:right;">
+21333
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2011
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+92
+</td>
+<td style="text-align:right;">
+10517
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2012
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+97
+</td>
+<td style="text-align:right;">
+1826
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2013
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+38
+</td>
+<td style="text-align:right;">
+140
+</td>
+<td style="text-align:right;">
+32606
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2014
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+43
+</td>
+<td style="text-align:right;">
+132
+</td>
+<td style="text-align:right;">
+52046
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2015
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+223
+</td>
+<td style="text-align:right;">
+7771
+</td>
+</tr>
+</tbody>
+</table></p>
+
+<h3 id="tipos-de-condenação">Tipos de condenação</h3>
+
+<p>As condenações estão dividas nos vários tipos de improbidade previstos
+pela Lei 8429 de 1992.
+<!--Visualiando os ressarcimentos de danos em cada tipo de improbidade concluímos que a 511 milhões de reais foram ressarcidos em processos por danos ao erário.--></p>
+
+<p><table class="table table-hover">
+<caption>
+Frequência dos assuntos processuais nas condenações por improbidade
+admnistrativa.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Motivo da condenação
+</th>
+<th style="text-align:right;">
+Frequência
+</th>
+<th style="text-align:left;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dano Ao Erário
+</td>
+<td style="text-align:right;">
+2169
+</td>
+<td style="text-align:left;">
+47.1%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Violação Aos Princípios Administrativos
+</td>
+<td style="text-align:right;">
+1331
+</td>
+<td style="text-align:left;">
+28.9%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Enriquecimento Ilícito
+</td>
+<td style="text-align:right;">
+475
+</td>
+<td style="text-align:left;">
+10.3%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Improbidade Administrativa
+</td>
+<td style="text-align:right;">
+315
+</td>
+<td style="text-align:left;">
+6.8%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Direito Administrativo E Outras Matérias De Direito Público
+</td>
+<td style="text-align:right;">
+265
+</td>
+<td style="text-align:left;">
+5.8%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outros
+</td>
+<td style="text-align:right;">
+51
+</td>
+<td style="text-align:left;">
+1.1%
+</td>
+</tr>
+</tbody>
+</table>
+A maior parte dos processos corre com o assunto &ldquo;Dano ao erário&rdquo;, que
+são responsáveis por 511 milhões de reais em ressarcimentos, ou 61% do
+total.</p>
+
+<p><table class="table table-hover">
+<caption>
+Total de ressarcimento por tipo de improbidade admnistrativa em milhões
+de reais.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Motivo da condenação
+</th>
+<th style="text-align:right;">
+Ressarcimento (MM R\$\$)
+</th>
+<th style="text-align:left;">
+%
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Dano Ao Erário
+</td>
+<td style="text-align:right;">
+511
+</td>
+<td style="text-align:left;">
+61.3%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Violação Aos Princípios Administrativos
+</td>
+<td style="text-align:right;">
+179
+</td>
+<td style="text-align:left;">
+21.5%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Improbidade Administrativa
+</td>
+<td style="text-align:right;">
+47
+</td>
+<td style="text-align:left;">
+5.6%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Direito Administrativo E Outras Matérias De Direito Público
+</td>
+<td style="text-align:right;">
+46
+</td>
+<td style="text-align:left;">
+5.5%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Enriquecimento Ilícito
+</td>
+<td style="text-align:right;">
+40
+</td>
+<td style="text-align:left;">
+4.8%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outros
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:left;">
+1.3%
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Excluindo as 6 condenações de 2013 e 2014 listadas abaixo, a discrepância entre os totais ressarcidos nos anos fica menor. Entretanto, ainda identifica-se um aumento no terceiro quartil dos anos de 2013 e 2014. -->
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   select(dt_pena, vl_ressarcimento) %>% -->
+<!--   top_n(-(3452-6)) %>%  -->
+<!--   mutate(ano = year(dt_pena)) %>%  -->
+<!--   filter(ano >= 2009, ano <= 2015) %>%  -->
+<!--   group_by(ano) %>%  -->
+<!--   summarise(ress = sum(vl_ressarcimento)/10^6) %>% -->
+<!--   ggplot(aes(x = ano, y = ress)) + -->
+<!--    geom_bar(fill = 'royalblue', stat = 'identity', color = 'black') +  -->
+<!--   theme_bw(15) + -->
+<!--   scale_x_continuous(breaks = min(ressarcimentos_por_ano_sem_estranhos$ano):max(ressarcimentos_por_ano_sem_estranhos$ano)) + -->
+<!--   ylab("Ressarcimento cadastrado até\no momento (MM R$)") +  -->
+<!--   xlab("Ano de condenação") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   select(dt_pena, vl_ressarcimento) %>% -->
+<!--   top_n(-(3452-6)) %>%  -->
+<!--   mutate(ano = year(dt_pena)) %>%  -->
+<!--   filter(ano >= 2009, ano <= 2015) %>%  -->
+<!--   group_by(ano) %>%  -->
+<!--   nest(vl_ressarcimento) %>%  -->
+<!--   mutate(qtl = map(data,~broom::tidy(quantile(.x$vl_ressarcimento)))) %>%  -->
+<!--   unnest(qtl) %>%  -->
+<!--   mutate(names = factor(names,c("0%","25%","50%","75%","100%")), -->
+<!--          x = round(x/10^6, 3)) %>%  -->
+<!--   spread(names, x) %>%  -->
+<!--   setNames(c("Ano", "Mínimo","1º Quartil","2º Quartil","3º Quartil","Máximo")) -->
+<!-- ``` -->
+<!-- ### Órgãos --></p>
+
+<h3 id="órgãos-afetados">Órgãos afetados</h3>
+
+<p>A administração municipal é a que mais sofre com as condenações por
+improbidade. Juntando os danos causados às prefeituras e aos municípios
+em geral, o CNIA estima essa perda em 381 milhões de reais.</p>
+
+<p><table class="table table-hover">
+<caption>
+Número de condenações separado por órgão do condenado.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Órgão
+</th>
+<th style="text-align:right;">
+Valor do ressarcimento (MM R\$)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Não Identificado
+</td>
+<td style="text-align:right;">
+314
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Prefeitura
+</td>
+<td style="text-align:right;">
+287
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Municipio
+</td>
+<td style="text-align:right;">
+94
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outros
+</td>
+<td style="text-align:right;">
+42
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caixa
+</td>
+<td style="text-align:right;">
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vereadores
+</td>
+<td style="text-align:right;">
+19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poder Executivo
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Inss
+</td>
+<td style="text-align:right;">
+13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Policia
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Secretaria
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Municipio, Prefeitura
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Correios
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Corpo De Bombeiros
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Demei
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Assembleia Legislativa
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Detran
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pmsp
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poder Legislativo
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vereadores, Municipio
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+Mas, como muitos registros não discriminam o órgão dos condenados, uma
+parte significativa das condenações não está associada a nenhum órgão em
+particular.</p>
+
+<p><table class="table table-hover">
+<caption>
+Total de ressarcimentos separado por órgão do condenado.
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Órgão
+</th>
+<th style="text-align:right;">
+Número de condenações
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Prefeitura
+</td>
+<td style="text-align:right;">
+1572
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Não Identificado
+</td>
+<td style="text-align:right;">
+1445
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Municipio
+</td>
+<td style="text-align:right;">
+501
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vereadores
+</td>
+<td style="text-align:right;">
+349
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Outros
+</td>
+<td style="text-align:right;">
+302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Secretaria
+</td>
+<td style="text-align:right;">
+111
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poder Executivo
+</td>
+<td style="text-align:right;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Correios
+</td>
+<td style="text-align:right;">
+49
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Caixa
+</td>
+<td style="text-align:right;">
+43
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Inss
+</td>
+<td style="text-align:right;">
+39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Municipio, Prefeitura
+</td>
+<td style="text-align:right;">
+39
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Policia
+</td>
+<td style="text-align:right;">
+25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Corpo De Bombeiros
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poder Legislativo
+</td>
+<td style="text-align:right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Vereadores, Municipio
+</td>
+<td style="text-align:right;">
+10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Detran
+</td>
+<td style="text-align:right;">
+8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Assembleia Legislativa
+</td>
+<td style="text-align:right;">
+6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Demei
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pmsp
+</td>
+<td style="text-align:right;">
+5
+</td>
+</tr>
+</tbody>
+</table>
+<!-- ### Esfera -->
+<!-- Com relação às esferas, os danos em sua maior parte vêm da esfera estadual. Entretanto, a proporção de ressarcimentos vinda da esfera federal chega a 37%. -->
+<!-- ```{r} -->
+<!-- tidy_ressarcimento_pos_cnc_sem_estranhos %>%  -->
+<!--   group_by(esfera_processo, tipo_pena) %>%  -->
+<!--   summarise(vl_ressarcimento = sum(vl_ressarcimento)/10^6) %>%  -->
+<!--   spread(tipo_pena, vl_ressarcimento) %>%  -->
+<!--   ungroup() %>%  -->
+<!--   mutate(esfera_processo = str_to_title(esfera_processo)) %>%  -->
+<!--   setNames(c("Esfera",colunas[2:3])) %>%  -->
+<!--   knitr::kable() -->
+<!-- ``` -->
+<!-- ### Tipos de pessoa --></p>
+
+<h3 id="pessoas-jurídicas">Pessoas jurídicas</h3>
+
+<p>7.08% dos condenados por improbidade são pessoas jurídicas. Entretanto,
+essa proporção não se mantém quando analisamos os ressarcimentos: 12.5%
+do total a ser ressarcido vem de empresas. Pessoas juŕidicas, em média,
+são condenadas a ressarcir o Estado em R\$300.000,00.</p>
+
+<p><img src="danos_files/figure-markdown/unnamed-chunk-10-1.png" alt="" /></p>
+
+<h3 id="distribuição-geográfica">Distribuição geográfica</h3>
+
+<p>A distribuição geográfica dos danos aumenta do norte para o Sul. No Sul
+e no Sudeste, os ressarcimentos por Estado ultrapassam 25MM, na maioria
+dos casos. No Nordeste, Roraima se destaca com um ressarcimento
+comparável ao de São Paulo, mas os estados com ressarcimento maior do qu
+25 milhões de reais são mais raros.</p>
+
+<p><img src="danos_files/figure-markdown/ress_abs-1.png" alt="" /></p>
+
+<!--A tabela com os valores ressarcidos e os respectivos números de processos segue abaixo. Note que não foi possível identificar a unidade da federação em 1850 processos, ou o equivalente a 7 milhões de reais em ressarcimentos.-->
+
+<p>Ao contrário do valor absoluto, a taxa de ressarcimento por habitante
+cresce do Sul para o Norte. A região com maior número de taxas acima de
+R\$5/habitante é a região Norte, que conta com Rondônia, Acre e Roraima,
+os estados de maior taxa, mas a Região Nordeste também se destaca.</p>
+
+<p><img src="danos_files/figure-markdown/unnamed-chunk-12-1.png" alt="" /></p>
+         </div>
       </div>
     </div>
-  </div>
-  
+
   <hr/>
   <div id="disqus_thread"></div>
 <script type="text/javascript">

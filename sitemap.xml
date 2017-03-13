@@ -7,12 +7,12 @@
   </url>
   
   <url>
-    <loc>https://abjur.github.io/inacSite/metodologia/</loc>
+    <loc>https://abjur.github.io/inacSite/sobre/</loc>
     <lastmod>2016-11-05T21:05:33+05:30</lastmod>
   </url>
   
   <url>
-    <loc>https://abjur.github.io/inacSite/sobre/</loc>
+    <loc>https://abjur.github.io/inacSite/metodologia/</loc>
     <lastmod>2016-11-05T21:05:33+05:30</lastmod>
   </url>
   
@@ -61,6 +61,12 @@
   </url>
   
   <url>
+    <loc>https://abjur.github.io/inacSite/tags/oi/</loc>
+    <lastmod>2015-07-23T21:13:14-05:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://abjur.github.io/inacSite/categories/r/</loc>
     <lastmod>2015-07-23T21:13:14-05:00</lastmod>
     <priority>0</priority>
@@ -69,6 +75,11 @@
   <url>
     <loc>https://abjur.github.io/inacSite/sobre/</loc>
     <lastmod>2016-11-05T21:05:33+05:30</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://abjur.github.io/inacSite/tags/</loc>
     <priority>0</priority>
   </url>
   
