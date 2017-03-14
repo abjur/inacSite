@@ -1,4 +1,4 @@
-blogdown::install_hugo(version = '0.18')
+blogdown::install_hugo(version = "0.19")
 
 rmd <- 'content/dashboard/index.Rmd'
 ufs <- c("AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", 
