@@ -1,0 +1,443 @@
+---
+date: "2016-11-05T21:05:33+05:30"
+title: "Dashboard"
+params:
+  uf: !r NA
+---
+
+<!-- ---------------------------------------------------------------------- -->
+<!-- BASE DE DADOS -->
+<!-- ---------------------------------------------------------------------- -->
+
+```{r pkgs, message=FALSE, warning=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(magrittr)
+library(tidyverse)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(leaflet)
+library(cnc)
+source('../../R/scripts.R')
+data(br_uf_map, package = 'abjData')
+data(pnud_uf, package = 'abjData')
+data(pnud_min, package = 'abjData')
+data(cadmun, package = 'abjData')
+
+pnud_min %<>%
+  filter(ano == 2010) %>% 
+  count(regiao, id = uf) %>% 
+  rename(n_muni = n)
+cadmun %<>% distinct(cod, uf) %>% mutate_all(as.character)
+pnud_uf %<>% 
+  filter(ano == 2010) %>% 
+  select(uf, ufn, popt) %>% 
+  mutate(uf = as.character(uf)) %>% 
+  inner_join(cadmun, c('uf' = 'cod')) %>% 
+  select(id = uf.y, ufn, popt) %>% 
+  inner_join(pnud_min, 'id')
+
+g <- '~/abj/kml-brasil/lib/2010/estados/geojson' %>% 
+  normalizePath() %>% 
+  dir(full.names = TRUE) %>% 
+  purrr::map(geojsonio::geojson_read, what = 'sp')
+feat <- g %>% 
+  purrr::map(~.x@lines) %>% 
+  purrr::reduce(append)
+feat %>% 
+  seq_along() %>% 
+  purrr::walk(~{feat[[.x]]@ID <<- as.character(.x)})
+g2 <- g[[1]]
+g2@lines <- feat
+g2@data <- g %>% 
+  purrr::map_df(~dplyr::mutate_all(.x@data, as.character)) %>% 
+  janitor::clean_names() %>% 
+  tibble::rownames_to_column('id') %>% 
+  tibble::as_tibble()
+
+
+
+```
+
+```{r df}
+cnc_vis <- tidy_cnc %>% 
+  filter(dt_cadastro < '2016-07-01', # escopo
+         # só transito em julgado
+         tipo_pena == 'Trânsito em julgado', 
+         # sem assunto penal
+         !assunto_penal_any,
+         # julgou depois de distribuir.
+         dt_pena > dt_propositura,
+         # ficou com n quase zero aqui.
+         instancia == '1 grau') %>% 
+  # se valores  são NA ou <= 0, teve_* correspondente é FALSE
+  mutate_at(vars(starts_with('vl_')), 
+            funs(if_else(. <= 0 | . > 5e7, NA_real_, .))) %>% 
+  mutate(teve_multa = !is.na(vl_multa),
+         teve_ressarcimento = !is.na(vl_ressarcimento),
+         teve_perda_bens = !is.na(vl_perda_bens)) %>% 
+  # se durações são NA ou <= 0, teve_* correspondente é FALSE
+  mutate_at(vars(starts_with('duracao_')), 
+            funs(if_else(. <= 0, NA_real_, .))) %>% 
+  mutate(teve_suspensao = !is.na(duracao_suspensao),
+         teve_proibicao = !is.na(duracao_proibicao)) %>% 
+  # tempo de condenacao
+  select(-teve_pena) %>% 
+  # criando um teve_all e modificando os teve_* para character
+  mutate(tempo_condenacao = as.numeric(dt_pena - dt_propositura)) %>% {
+    d <- .
+    nms <- d %>% select(starts_with('teve_')) %>% names()
+    nms_clean <- nms %>% str_replace_all('^teve_', '')
+    purrr::walk2(nms, nms_clean, ~{
+      d[[.x]] <<- d[[.x]] %>% 
+        if_else(.y, 'NA') %>% 
+        type.convert(as.is = TRUE)
+    })
+    d
+  } %>% 
+  unite(teve_all, starts_with('teve_'), sep = ',', remove = FALSE) %>% 
+  mutate(teve_all = teve_all %>% 
+           str_replace_all(',NA|^NA,(NA,)*|NA$', '')) %>%
+  select(id_condenacao, id_processo, id_pessoa,
+         # condenacoes
+         dt_condenacao = dt_pena, tempo_condenacao,
+         starts_with('teve_'),
+         starts_with('vl_'),
+         starts_with('de_'), -de_pena,
+         -starts_with('ate_'),
+         starts_with('duracao_'), -duracao_pena, -ends_with('_regex'),
+         starts_with('assunto_cod'), -assunto_cod_5,
+         starts_with('assunto_nm'), -assunto_nm_5,
+         # processos
+         n_processo, dt_cadastro, dt_propositura,
+         esfera_processo, tribunal, instancia,
+         comarca_secao, vara_camara, uf_processo,
+         # pessoas
+         tipo_pessoa, nm_pessoa, sexo, 
+         publico, esfera, orgao, cargo
+         ) %>% 
+  # unite(assunto_cod_all, starts_with('assunto_cod'), sep = ',') %>% 
+  # unite(assunto_nm_all, starts_with('assunto_nm'), sep = ',') %>% 
+  nest(starts_with('assunto_nm_')) %>% 
+  mutate(assunto_nm_all = map_chr(data, ~{
+    .x %>% 
+      gather() %>% 
+      filter(!is.na(value)) %>% 
+      arrange(value) %>% 
+      with(value) %>% 
+      paste(collapse = ',')
+  })) %>% 
+  select(-matches('^data$|^assunto_nm_[0-9]')) %>% 
+  nest(starts_with('assunto_cod_')) %>% 
+  mutate(assunto_cod_all = map_chr(data, ~{
+    .x %>% 
+      gather() %>% 
+      filter(!is.na(value)) %>% 
+      arrange(value) %>% 
+      with(value) %>% 
+      paste(collapse = ',')
+  })) %>% 
+  select(-matches('^data$|^assunto_cod_[0-9]')) %>% 
+  arrange(floor_date(dt_cadastro, 'day'), as.numeric(id_processo))
+```
+
+```{r filters, eval = !is.na(params$uf), echo=FALSE}
+cnc_vis <- cnc_vis %>% 
+  filter(uf_processo == params$uf)
+```
+
+<!-- COMPUTACOES -------------------------------------------------------------->
+
+```{r computacoes}
+n_condenacoes <- n_distinct(cnc_vis$id_condenacao)
+n_processos <- n_distinct(cnc_vis$id_processo)
+n_pessoas <- n_distinct(cnc_vis$id_pessoa)
+
+tab_n <- tibble::tibble(
+  Condenações = n_condenacoes,
+  Processos = n_processos,
+  Pessoas = n_pessoas,
+  `Valor multas` = sum(cnc_vis$vl_multa, na.rm = TRUE) %>% 
+    scales::dollar(),
+  `Valor ressarcimentos` = sum(cnc_vis$vl_ressarcimento, na.rm = TRUE) %>% 
+    scales::dollar()
+)
+
+tab_teves1 <- cnc_vis %>% 
+  gather(tipo_teve, teve, starts_with('teve'), -teve_all) %>% 
+  group_by(tipo_teve) %>% 
+  summarise(prop = sum(!is.na(teve)) / n()) %>% 
+  arrange(desc(prop)) %>% 
+  mutate(prop = scales::percent(prop))
+
+tab_teves2 <- cnc_vis %>% 
+  count(teve_all, sort = TRUE) %>% 
+  mutate(prop = n/sum(n), prop = scales::percent(prop))
+```
+
+<!-- SUMARIO ----------------------------------------------------------------->
+
+```{r}
+knitr::kable(tab_n)
+```
+
+
+<!-- MAPAS ------------------------------------------------------------------->
+
+## Mapa das condenações {.tabset .tabset-sticky}
+
+### Condenações por 100.000 habitantes
+
+```{r}
+create_map(cnc_vis, 'um', g2)
+```
+
+### Condenações por município
+
+```{r}
+create_map(cnc_vis, 'um', g2, denominador = 'n_muni')
+```
+
+
+## Mapa das punições {.tabset .tabset-sticky}
+
+```{r}
+# cnc_vis %>% 
+#   names() %>% 
+#   purrr::keep(~stringr::str_detect(.x, '^teve')) %>% 
+#   {sprintf("create_map(cnc_vis, '%s')", .)} %>% 
+#   cat(sep = '\n')
+```
+
+### Inelegibilidade
+
+```{r, width="100%"}
+create_map(cnc_vis, 'teve_inelegivel', g2)
+```
+
+### Multa
+
+```{r}
+create_map(cnc_vis, 'teve_multa', g2)
+```
+
+### Perda de bens
+
+```{r}
+create_map(cnc_vis, 'teve_perda_bens', g2)
+```
+
+### Perda Cargo
+
+```{r}
+create_map(cnc_vis, 'teve_perda_cargo', g2)
+```
+
+### Proibição
+
+```{r}
+create_map(cnc_vis, 'teve_proibicao', g2)
+```
+
+### Ressarcimento
+
+```{r}
+create_map(cnc_vis, 'teve_ressarcimento', g2)
+```
+
+### Suspensão
+
+```{r}
+create_map(cnc_vis, 'teve_suspensao', g2)
+```
+
+## Mapa dos valores {.tabset .tabset-sticky}
+
+### Ressarcimento mediano
+
+```{r}
+create_map(cnc_vis, 'vl_ressarcimento', g2, denominador = 'um', fun = function(x) median(x, na.rm = TRUE))
+```
+
+### Multa mediana
+
+```{r}
+create_map(cnc_vis, 'vl_multa', g2, denominador = 'um', fun = function(x) median(x, na.rm = TRUE))
+```
+
+### Ressarcimento por habitante
+
+```{r}
+create_map(cnc_vis, 'vl_ressarcimento', g2, denominador = 'pop', fun = function(x) sum(x, na.rm = TRUE))
+```
+
+
+### Multa por habitante
+
+```{r}
+create_map(cnc_vis, 'vl_multa', g2, denominador = 'pop', fun = function(x) sum(x, na.rm = TRUE))
+```
+
+<!-- CONDENACOES ------------------------------------------------------------->
+
+## Condenações
+
+```{r}
+library(networkD3)
+tab_count1 <- cnc_vis %>% 
+  filter(teve_all != '') %>% 
+  # separate(assunto_nm_all, 
+  #          paste0("assunto_nm_", 1:4), sep = ',',
+  #          fill = "right") %>% 
+  # rename(assunto_nm_all = assunto_nm_1) %>% 
+  count(teve_all, assunto_nm_all) %>% 
+  ungroup() %>% 
+  arrange(desc(n)) %>% 
+  mutate(prop_acu = cumsum(n) / sum(n)) %>% 
+  filter(prop_acu < .8) 
+
+tab_count2 <- cnc_vis %>% 
+  filter(teve_all != '') %>% 
+  separate(assunto_nm_all, 
+           paste0("assunto_nm_", 1:4), sep = ',',
+           fill = "right") %>% 
+  rename(assunto_nm_all = assunto_nm_1) %>% 
+  gather(key, val, starts_with('teve'), -teve_all) %>% 
+  group_by(assunto_nm_all, key) %>% 
+  summarise(n = sum(!is.na(val))) %>% 
+  ungroup() %>% 
+  arrange(desc(n)) %>% 
+  head(40) %>% 
+  mutate(teve_all = str_replace_all(key, 'teve_', '')) %>% 
+  select(assunto_nm_all, teve_all, n) %>% 
+  mutate(prop_acu = cumsum(n) / sum(n)) %>% 
+  filter(prop_acu < .8) 
+
+
+tab_count3 <- cnc_vis %>% 
+  separate(assunto_nm_all, 
+           paste0("assunto_nm_", 1:4), sep = ',',
+           fill = "right") %>% 
+  rename(assunto_nm_all = assunto_nm_1)
+
+
+
+tab_count <- tab_count1
+
+nodes <- unique(c(tab_count$teve_all, tab_count$assunto_nm_all)) %>% 
+  sort() %>% 
+  tibble::enframe() %>% 
+  select(name = value) %>%
+  as.data.frame()
+links <- tab_count %>% 
+  transmute(target = map_dbl(teve_all, ~{which(.x == nodes$name) - 1}),
+            source = map_dbl(assunto_nm_all, ~{which(.x == nodes$name) - 1}),
+            value = n) %>% 
+  as.data.frame()
+sankeyNetwork(Links = links, Nodes = nodes, Source = "source",
+              Target = "target", Value = "value", NodeID = "name",
+              units = "", fontSize = 12, nodeWidth = 30)
+```
+
+```{r}
+tab_count %>% 
+  group_by(assunto_nm_all) %>% 
+  mutate(teve_all = teve_all %>% 
+           str_replace_all(',', '\n') %>% 
+           fct_reorder(n)) %>% 
+  ggplot(aes(x = teve_all, y = n)) +
+  geom_col(position = 'dodge') +
+  facet_wrap(~assunto_nm_all, scales = 'free', ncol = 3) +
+  theme_bw()
+```
+
+<!-- PESSOAS ----------------------------------------------------------------->
+
+Relatórios
+
+- Pessoas
+- Processos
+- Condenações
+
+# Pessoas
+
+```{r eval=FALSE}
+tidy_pessoa <- tidy_vis %>% 
+  # filtro do parametro
+  filter(esfera_processo == esfera_processo) %>% 
+  # filtro do parametro
+  select(id_pessoa, tipo_pessoa:cod, everything()) %>% 
+  group_by(id_pessoa, tipo_pessoa, nm_pessoa, sexo, publico, esfera,
+           orgao, cargo, uf, cod) %>% 
+  tidyr::nest()
+```
+
+
+O que quero saber das pessoas?
+
+- perfil: sexo, publico, 
+
+```{r}
+# tab <- tidy_cnc %>% 
+#   mutate(tempo_processo = runif(n())) %>% 
+#   create_vis(cruzamentos)
+```
+
+<!-- ---------------------------------------------------------------------- -->
+
+Análises
+
+- condenações com teve_*
+
+Mapas
+
+- volume de pessoas por unidade federativa (/ populacao)
+- aff
+
+<!-- ----------------------------------------------------------------------- -->
+
+## Caracterização
+
+- coluna com mapas
+
+## Punições
+
+- mapa assuntos x punicoes
+
+## Danos
+
+## Tempos
+
+
+## Componentes
+
+## Evolução
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
