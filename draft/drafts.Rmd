@@ -1,0 +1,108 @@
+---
+title: "Rascunhos"
+author: "J"
+date: "March 13, 2017"
+output: html_document
+---
+
+```{r eval=FALSE}
+library(crosstalk)
+library(leaflet)
+library(DT)
+
+# Wrap data frame in SharedData
+sd <- SharedData$new(quakes[sample(nrow(quakes), 100),])
+
+# Create a filter input
+filter_slider("mag", 
+              "Magnitude", 
+              sd, 
+              column=~mag, 
+              step=0.1, 
+              width=250)
+
+# Use SharedData like a dataframe with Crosstalk-enabled widgets
+bscols(
+  leaflet(sd) %>% 
+    addTiles() %>% 
+    addMarkers(),
+  datatable(sd, 
+            extensions="Scroller", 
+            style="bootstrap", 
+            class="compact", 
+            width="100%",
+            options=list(deferRender=TRUE, scrollY=300, scroller=TRUE))
+)
+```
+
+```{r eval=FALSE}
+library(ggplot2)
+library(shiny)
+library(leaflet)
+data('br_uf_map', package = 'abjData')
+
+sd <- SharedData$new(tidy_cnc, ~id_condenacao)
+
+library(geojsonio)
+
+
+
+
+
+
+dd <- g2@data
+dd$pol <- g2@lines
+dd$lat <- purrr::map_dbl(dd$pol, ~.x@Lines[[1]]@coords[,2][1])
+dd$lon <- purrr::map_dbl(dd$pol, ~.x@Lines[[1]]@coords[,1][1])
+sd <- SharedData$new(dd, ~id)
+bscols(
+  filter_select('aff', 
+                label = 'Selecione o estado', 
+                sharedData = sd, 
+                group = ~name,
+                multiple = FALSE
+  ), 
+  {
+    l <- leaflet(sd) %>% 
+      addTiles() %>% 
+      addMarkers()
+    for (i in 1:nrow(sd$data())) {
+      l <- addPolylines(l, data = sd$data()$pol[[i]])
+    }
+    l
+  }
+  
+)
+
+
+sd <- SharedData$new(br_uf_map, ~id)
+bscols(
+  filter_select('aff', 
+                label = 'Selecione o estado', 
+                sharedData = sd, 
+                group = ~id,
+                multiple = FALSE
+  ), sd$data() %>% 
+      leaflet() %>% 
+      addTiles() %>% 
+      addPolygons(lng = ~long, 
+                  lat = ~lat)
+)
+
+
+
+filter_slider("sep", 
+              "Sepal", 
+              sd2, 
+              column=~Sepal.Length, 
+              step=0.1, 
+              width=250)
+
+# renderPlot({
+  df <- sd2$data(withSelection = TRUE, withFilter = TRUE)
+  ggplot(df, aes(Sepal.Length, Sepal.Width,
+    color = selection_factor(df))) +
+    geom_point() +
+    scale_color_selection("#444444", "skyblue1")
+# })
+```
