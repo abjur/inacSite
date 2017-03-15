@@ -106,3 +106,108 @@ filter_slider("sep",
     scale_color_selection("#444444", "skyblue1")
 # })
 ```
+
+
+
+```{r}
+tab_count %>% 
+  group_by(assunto_nm_all) %>% 
+  mutate(teve_all = teve_all %>% 
+           str_replace_all(',', '\n') %>% 
+           fct_reorder(n)) %>% 
+  ggplot(aes(x = teve_all, y = n)) +
+  geom_col(position = 'dodge') +
+  facet_wrap(~assunto_nm_all, scales = 'free', ncol = 3) +
+  theme_bw()
+```
+
+<!-- PESSOAS ----------------------------------------------------------------->
+
+Relatórios
+
+- Pessoas
+- Processos
+- Condenações
+
+# Pessoas
+
+```{r eval=FALSE}
+tidy_pessoa <- tidy_vis %>% 
+  # filtro do parametro
+  filter(esfera_processo == esfera_processo) %>% 
+  # filtro do parametro
+  select(id_pessoa, tipo_pessoa:cod, everything()) %>% 
+  group_by(id_pessoa, tipo_pessoa, nm_pessoa, sexo, publico, esfera,
+           orgao, cargo, uf, cod) %>% 
+  tidyr::nest()
+```
+
+
+O que quero saber das pessoas?
+
+- perfil: sexo, publico, 
+
+```{r}
+# tab <- tidy_cnc %>% 
+#   mutate(tempo_processo = runif(n())) %>% 
+#   create_vis(cruzamentos)
+```
+
+<!-- ---------------------------------------------------------------------- -->
+
+Análises
+
+- condenações com teve_*
+
+Mapas
+
+- volume de pessoas por unidade federativa (/ populacao)
+- aff
+
+<!-- ----------------------------------------------------------------------- -->
+
+## Caracterização
+
+- coluna com mapas
+
+## Punições
+
+- mapa assuntos x punicoes
+
+## Danos
+
+## Tempos
+
+
+## Componentes
+
+## Evolução
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
