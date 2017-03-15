@@ -3,7 +3,7 @@
     <div class="categories-block">
       <a href="" class="track-categories">//</a>
       {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
-      <a href="{{ "/categories/" }}{{ $name | urlize }}">{{ $name }}</a>
+      <a href="/">{{ $name }}</a>
       {{ end }}
     </div>
   </div>

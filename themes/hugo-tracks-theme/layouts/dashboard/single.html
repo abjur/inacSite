@@ -26,9 +26,23 @@
         
         <div style="border:1px solid black;height:100px;">
         <form id='filtros' action="" method="GET">
-          <select id="uf">
+          
+        <select id="uf">
+        <option value="" selected>Todos</option>
+        <option value="_Centro-Oeste">Centro-Oeste</option>
+        <option value="_Nordeste">Nordeste</option>
+        <option value="_Norte">Norte</option>
+        <option value="_Sudeste">Sudeste</option>
+        <option value="_Sul">Sul</option>
+        </select>
+        
+        <select id="esfera">
+        <option value="" selected>Todos</option>
+        <option value="_Estadual">Estadual</option>
+        <option value="_Federal">Federal</option>
+        </select>
             
-            <option value="index_AC" selected>AC</option>
+<!--            <option value="index_AC" selected>AC</option>
             <option value="index_AL">AL</option>
             <option value="index_AM">AM</option>
             <option value="index_AP">AP</option>
@@ -54,14 +68,11 @@
             <option value="index_SC">SC</option>
             <option value="index_SE">SE</option>
             <option value="index_SP">SP</option>
-            <option value="index_TO">TO</option>
-            </select>
-            
-            <button type="submit" class="btn btn-primary">Vai</button>
+            <option value="index_TO">TO</option>-->
+            <button type="submit" class="btn btn-primary">Gerar visualizações</button>
             
         </form>
         </div>
-        
          <h1>{{ .Title }}</h1>
          {{ .Content }}
       </div>
@@ -79,9 +90,16 @@
     {{ partial "scripts.html" . }}
     
     <script type="text/javascript">
-    $('#uf').change(function() {
-      $('#filtros').attr('action', "http://127.0.0.1:4321/dashboard/" + 
-      $('#uf option:selected').attr('value')) + '/';
+    $('#filtros').hover(function() {
+      base = "/dashboard/";
+      x = base + "index" + 
+      $('#uf option:selected').attr('value') + 
+      $('#esfera option:selected').attr('value');
+      if (x == (base + "index")) {
+        $('#filtros').attr('action', base);
+      } else {
+        $('#filtros').attr('action', x);
+      }
     });
     </script>
     
