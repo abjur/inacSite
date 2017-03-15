@@ -6,5 +6,10 @@ public/
 .DS_Store
 content/historias/*.html
 content/historias/*_files/
-content/metodologia/*_files/
 content/historias/*.md
+content/metodologia/*_files/
+content/metodologia/*.md
+content/metodologia/*.html
+content/dashboard/*_files/
+content/dashboard/*.md
+content/dashboard/*.html
