@@ -1,0 +1,250 @@
+---
+title: "Tempos"
+image: "img/portfolio/a4-paper.jpg"
+date: 2015-07-23T21:13:14-05:00
+categories: ["Monitor da improbidade"]
+draft: false
+weight: 0
+---
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+source('/home/jtrecenti/abj/inacSite/R/scripts.R')
+# source('/home/jtrecenti/abj/inacSite/R/cnc-vis.R')
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(magrittr)
+library(tidyverse)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(leaflet)
+library(cnc)
+load('env.rda')
+params <- eval(parse(text = 'list(uf = NA, regiao = NA, esfera_processo = NA)'))
+```
+
+-------------------------------------------------------------------------------
+
+## Análise da duração das punições
+
+```{r}
+resumir <- function(x) {
+  c(n = length(x),
+    n_na = sum(is.na(x)),
+    mean = mean(x, na.rm = TRUE),
+    sd = sd(x, na.rm = TRUE),
+    min = min(x, na.rm = TRUE),
+    qt = quantile(x, .25, na.rm = TRUE),
+    median = median(x, na.rm = TRUE),
+    qt = quantile(x, .75, na.rm = TRUE),
+    max = max(x, na.rm = TRUE)) %>% 
+    enframe() %>% 
+    mutate(name = factor(name, levels = name))
+}
+```
+
+### Suspensão dos Direitos Políticos.
+
+```{r}
+tidy_cnc_suspensao <- cnc_vis %>% 
+  filter(!is.na(teve_suspensao)) %>% 
+  mutate(duracao_suspensao = if_else(
+    is.na(duracao_suspensao) | duracao_suspensao < 0,
+    NA_real_, duracao_suspensao
+  ))
+```
+
+
+```{r}
+tidy_cnc_suspensao %>% 
+  filter(esfera_processo %in% c('Estadual')) %>% 
+  mutate(uf_processo = fct_lump(uf_processo, 
+                                prop = .005, 
+                                other_level = 'Outros')) %>% 
+  group_by(uf_processo) %>% 
+  do(resumir(.$duracao_suspensao)) %>% 
+  mutate(value = round(value)) %>% 
+  spread(name, value) %>% 
+  ungroup() %>% 
+  arrange(desc(n)) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
+
+```{r}
+tidy_cnc_suspensao %>% 
+  filter(duracao_suspensao < 11 * 365) %>% 
+  ggplot(aes(x = duracao_suspensao / 365)) +
+  geom_vline(xintercept = 1:10, colour = 'gray80') +
+  geom_histogram(bins = 40) +
+  theme_bw() +
+  scale_x_continuous(breaks = 0:20) +
+  xlab('Duração da suspensão (anos)')
+```
+
+Note a concentração em anos cheios
+
+```{r}
+tidy_cnc_suspensao %>% 
+  filter(esfera_processo %in% c('Estadual')) %>% 
+  mutate(anos_suspensao = cut(duracao_suspensao / 365, 
+                              c(0:10, 16))) %>% 
+  mutate(uf_processo = fct_lump(uf_processo, 6, 
+                                other_level = 'Outros')) %>% 
+  count(uf_processo, anos_suspensao) %>% 
+  mutate(prop = n / sum(n)) %>% 
+  ggplot(aes(x = anos_suspensao, y = prop)) +
+  geom_bar(aes(fill = uf_processo), colour = 'gray10',
+           position = 'dodge', stat = 'identity') +
+  # facet_wrap(~uf_processo, scales = 'free_y') +
+  theme_bw()
+```
+
+### Proibição de Contratar com o Poder Público
+
+```{r}
+tidy_cnc_proibicao <- cnc_vis %>% 
+  filter(!is.na(teve_proibicao)) %>% 
+  mutate(duracao_proibicao = if_else(
+    is.na(duracao_proibicao) | duracao_proibicao < 0,
+    NA_real_, duracao_proibicao
+  ))
+```
+
+
+```{r}
+tidy_cnc_proibicao %>% 
+  filter(esfera_processo %in% c('Estadual')) %>% 
+  mutate(uf_processo = fct_lump(uf_processo, 
+                                prop = .005, 
+                                other_level = 'Outros')) %>% 
+  group_by(uf_processo) %>% 
+  do(resumir(.$duracao_proibicao)) %>% 
+  mutate(value = round(value)) %>% 
+  spread(name, value) %>% 
+  ungroup() %>% 
+  arrange(desc(n)) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
+
+```{r}
+tidy_cnc_proibicao %>% 
+  filter(duracao_proibicao < 11 * 365) %>% 
+  ggplot(aes(x = duracao_proibicao / 365)) +
+  geom_vline(xintercept = 1:10, colour = 'gray80') +
+  geom_histogram(bins = 40) +
+  theme_bw() +
+  scale_x_continuous(breaks = 0:20) +
+  xlab('Duração da proibição (anos)')
+```
+
+```{r}
+tidy_cnc_proibicao %>% 
+  filter(esfera_processo %in% c('Estadual')) %>% 
+  mutate(anos_proibicao = cut(duracao_proibicao / 365, 
+                              c(0:10, 16))) %>% 
+  mutate(uf_processo = fct_lump(uf_processo, 6, 
+                                other_level = 'Outros')) %>% 
+  count(uf_processo, anos_proibicao) %>% 
+  mutate(prop = n / sum(n)) %>% 
+  ggplot(aes(x = anos_proibicao, y = prop)) +
+  geom_bar(aes(fill = uf_processo), colour = 'gray10',
+           position = 'dodge', stat = 'identity') +
+  # facet_wrap(~uf_processo, scales = 'free_y') +
+  theme_bw()
+```
+
+
+## Análise dos tempos dos processos
+
+```{r}
+tidy_cnc %>% 
+  mutate(tempo_processo = as.numeric(dt_pena - dt_propositura)) %>% 
+  filter(tempo_processo > 0) %>%
+  mutate(esfera_processo = fct_lump(esfera_processo, 2)) %>% 
+  mutate(instancia = fct_lump(instancia, 2)) %>% 
+  filter(as.character(instancia) != 'Other') %>% 
+  filter(as.character(esfera_processo) != 'Other') %>% 
+  identity() %>% {
+    txt <- count(., uf_processo, instancia, esfera_processo)
+    ggplot(., aes(x = uf_processo, y = tempo_processo)) +
+      geom_boxplot() +
+      facet_grid(instancia ~ esfera_processo) +
+      geom_text(aes(label = n, y = 7000), data = txt) +
+      theme_bw()
+  }
+  
+```
+
+
+-------------------------------------------------------------------------------
+
+## Historinha
+
+### Processos
+
+```{r}
+grupos <- c('instancia', 'esfera_processo')
+
+tabela_tempos <- function(d, ...) {
+  l <- lazyeval::lazy_dots(...)
+  v <- as.character(purrr::transpose(l)$expr)
+  dx <- d %>% 
+    mutate(tempo = as.numeric(dt_condenacao - dt_propositura, units = 'days'))
+  tab1 <- dx %>%     
+    group_by_(.dots = l) %>% 
+    do(resumir(.$tempo)) %>% 
+    mutate(value = round(value)) %>% 
+    spread(name, value) %>% 
+    ungroup() %>% 
+    arrange(desc(n))
+  tab2 <- dx %>%
+    do(resumir(.$tempo)) %>%
+    mutate(value = round(value)) %>%
+    spread(name, value) %>%
+    ungroup()
+  res <- bind_rows(tab1, tab2)
+  res[[v[1]]][nrow(res)] <- 'Total'
+  res
+}
+
+cnc_vis %>% 
+  tabela_tempos(instancia, esfera_processo) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+cnc_vis %>% 
+  tabela_tempos(esfera) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+cnc_vis %>% 
+  tabela_tempos(publico) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+cnc_vis %>% 
+  tabela_tempos(sexo) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+cnc_vis %>% 
+  tabela_tempos(tipo_pessoa) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+cnc_vis %>% 
+  filter(instancia == '1 grau') %>% 
+  tabela_tempos(uf_processo) %>% 
+  filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
