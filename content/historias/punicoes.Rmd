@@ -1,19 +1,17 @@
 ---
-title: "Punicoes"
-author: "Frida Gomam"
-image: "img/portfolio/a4-paper.jpg"
+title: "Punições"
+image: "img/portfolio/img1_crop.png"
 date: 2015-07-23T21:13:14-05:00
-categories: ["R"]
+categories: ["Monitor da improbidade"]
 draft: false
 weight: 0
 ---
 
-```{r}
+```{r collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F}
 library(tidyverse)
 library(stringr)
 library(lubridate)
 library(forcats)
-
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
 
@@ -50,7 +48,10 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F)
+knitr::opts_chunk$set(collapse = TRUE, 
+                      eval = T, echo = F, 
+                      error = F, message = F, 
+                      comment = F)
 
 data(tidy_cnc, package = 'cnc')
 data(br_uf_map, package = 'abjData')

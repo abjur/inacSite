@@ -1,16 +1,15 @@
 ---
 title: "Danos"
-author: "Frida Gomam"
 date: 2015-07-23T21:13:14-05:00
-image: "img/portfolio/a4-paper.jpg"
-categories: ["R"]
+image: "img/portfolio/banner-14.png"
+categories: ["Monitor da improbidade"]
 tags: ["oi"]
 draft: false
 weight: 0
 always_allow_html: yes
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=F, warning=F, message=F}
 library(tidyverse)
 library(stringr)
 library(lubridate)
@@ -52,7 +51,12 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-knitr::opts_chunk$set(collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F, warning = F)
+knitr::opts_chunk$set(collapse = TRUE, 
+                      eval = T, 
+                      echo = F, 
+                      message = F, 
+                      comment = F, 
+                      warning = F)
 
 data(tidy_cnc, package = 'cnc')
 data(br_uf_map, package = 'abjData')
@@ -104,7 +108,6 @@ Todo os anos, em média `r round(with(condenados_improb_ano, mean(n)),0)` pessoa
 <!-- Essa tendência pode indicar uma maior eficácia no combate à improbidade administrativa, mas também pode indicar uma melhora no cadastramento de informações no CNIA. -->
 
 ```{r}
-
 tidy_ressarcimento_ano %>%
   filter(ano >= 2009) %>% 
   ggplot(aes(x = ano, y = round(ress/10^6))) +
