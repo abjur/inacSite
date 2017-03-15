@@ -13,3 +13,13 @@ content/metodologia/*.html
 content/dashboard/*_files/
 content/dashboard/*.md
 content/dashboard/*.html
+static/historias/*.html
+static/historias/*_files/
+static/historias/*.md
+static/metodologia/*_files/
+static/metodologia/*.md
+static/metodologia/*.html
+static/dashboard/*_files/
+static/dashboard/*.md
+static/dashboard/*.html
+static/rmarkdown-libs/
