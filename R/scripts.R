@@ -1,10 +1,10 @@
 print_var <- function(v) {
   
-  tidy_vis <- tidy_cnc %>% 
+  tidy_vis <- cnc_vis %>% 
     filter(esfera_processo %in% c('Estadual', 'Federal'),
-           instancia %in% c('1 grau', '2 grau'),
-           tipo_pena == 'Trânsito em julgado',
-           !assunto_penal_any)
+           instancia %in% c('1 grau', '2 grau')) %>% 
+    inner_join(pnud_uf, c("uf_processo" = 'id'))
+  
   x <- stringr::str_replace_all(sort(unique(tidy_vis[[v]])), ' +', '_')
   nms <- stringr::str_to_title(stringr::str_replace_all(x, '_', ' '))
   lab <- stringr::str_to_title(stringr::str_replace_all(v, '_', ' '))
@@ -77,85 +77,89 @@ create_vis <- function(d, cruzamentos) {
 
 create_map <- function(d, var, map, denominador = 'pop',
                        fun = function(x) sum(!is.na(x))) {
-  suppressWarnings({
-    
-    contas <- d %>%
-      mutate(um = 1) %>% 
-      mutate(id = uf_processo) %>%
-      inner_join(pnud_uf, 'id') %>% 
-      rename_(pop = if_else(denominador == 'pop', 'popt', 
-                            if_else(denominador == 'n_muni', 'n_muni', 'um')))
-    
-    cortar <- function(x) {
-      br <- unique(c(0, round(quantile(x, 0:4 / 4), 2)))
-      cut(round(x, 2), breaks = br, 
-          dig.lab = 10, 
-          include.lowest = TRUE)
-    }
-    
-    make_lab <- function(var, denominador, id, den, pop, labn, nn, razao) {
-      if (str_detect(var, '^vl_') & denominador == 'um') {
-        sprintf("<strong>UF</strong>: %s<br/>
-                 <strong>Valor</strong>: %s<br/>",
-                id, scales::dollar(nn))
-      } else {
-        sprintf("<strong>UF</strong>: %s<br/>
-                 <strong>%s</strong>: %s<br/>
-                 <strong>%s</strong>: %s<br/>
-                 <strong>Razão</strong>: %s",
-                id, 
-                den, format(pop, big.mark = '.', decimal.mark = ','), 
-                labn, 
-                if_else(rep(str_detect(var, '^vl_'), length(nn)), 
-                        scales::dollar(nn), 
-                        as.character(round(nn))), 
-                round(razao, 2))
+  tryCatch({
+    suppressWarnings({
+      
+      contas <- d %>%
+        mutate(um = 1) %>% 
+        mutate(id = uf_processo) %>%
+        inner_join(pnud_uf, 'id') %>% 
+        rename_(pop = if_else(denominador == 'pop', 'popt', 
+                              if_else(denominador == 'n_muni', 'n_muni', 'um')))
+      
+      cortar <- function(x) {
+        br <- unique(c(0, round(quantile(x, 0:4 / 4), 2)))
+        cut(round(x, 2), breaks = br, 
+            dig.lab = 10, 
+            include.lowest = TRUE)
       }
-    }
-    
-    den <- if_else(denominador != 'n_muni', 'População', 'Qtd. Municípios')
-    mult <- if_else(denominador == 'pop', 1e5, 1.0)
-    var2 <- if_else(var == 'um', 'Condenações <br/>/ 100.000 Hab.',
-                    str_to_title(str_replace_all(var, '_+', ' ')))
-    if (denominador == 'n_muni') {
-      var2 <- 'Condenações <br/>/ Município'
-    }
-    labn <- 'Condenações'
-    if (str_detect(var, '^vl_')) labn <- 'Valor'
-    
-    labs <- contas %>% 
-      arrange(id) %>% 
-      group_by(id) %>% 
-      summarise_at(vars(one_of(var)),
-                   funs(nn = fun(.), pop = first(pop), razao = nn / pop * mult)) %>% 
-      mutate(lab = make_lab(var, denominador, id, den, pop, labn, nn, razao)) %>% 
-      mutate(razao = cortar(razao)) %>% 
-      mutate(lab = purrr::map(lab, htmltools::HTML)) %>% 
-      select(id, nn, razao, lab)
-    labs[[var]] <- labs[['razao']]
-    
-    map@data %<>% inner_join(labs, c('name' = 'id'))
-    
-    pal <- colorFactor('YlOrRd', NULL)
-    fpal <- as.formula(glue::glue('~pal({var})'))
-    leaflet(map) %>%
-      addTiles() %>% 
-      addPolygons(fillColor = fpal,
-                  color = 'black',
-                  fillOpacity = 0.6,
-                  weight = 2,
-                  label = map@data$lab,
-                  labelOptions = labelOptions(
-                    style = list("font-weight" = "normal", 
-                                 padding = "3px 8px"),
-                    textsize = "15px",
-                    direction = "auto"
-                  )) %>% 
-      addLegend(pal = pal, 
-                title = var2,
-                values = as.formula(paste0('~', var)),
-                position = 'bottomright')
-  })
+      
+      make_lab <- function(var, denominador, id, den, pop, labn, nn, razao) {
+        if (str_detect(var, '^vl_') & denominador == 'um') {
+          sprintf("<strong>UF</strong>: %s<br/>
+                  <strong>Valor</strong>: %s<br/>",
+                  id, scales::dollar(nn))
+        } else {
+          sprintf("<strong>UF</strong>: %s<br/>
+                  <strong>%s</strong>: %s<br/>
+                  <strong>%s</strong>: %s<br/>
+                  <strong>Razão</strong>: %s",
+                  id, 
+                  den, format(pop, big.mark = '.', decimal.mark = ','), 
+                  labn, 
+                  if_else(rep(str_detect(var, '^vl_'), length(nn)), 
+                          scales::dollar(nn), 
+                          as.character(round(nn))), 
+                  round(razao, 2))
+        }
+      }
+      
+      den <- if_else(denominador != 'n_muni', 'População', 'Qtd. Municípios')
+      mult <- if_else(denominador == 'pop', 1e5, 1.0)
+      var2 <- if_else(var == 'um', 'Condenações <br/>/ 100.000 Hab.',
+                      str_to_title(str_replace_all(var, '_+', ' ')))
+      if (denominador == 'n_muni') {
+        var2 <- 'Condenações <br/>/ Município'
+      }
+      labn <- 'Condenações'
+      if (str_detect(var, '^vl_')) labn <- 'Valor'
+      
+      labs <- contas %>% 
+        arrange(id) %>% 
+        group_by(id) %>% 
+        summarise_at(vars(one_of(var)),
+                     funs(nn = fun(.), pop = first(pop), razao = nn / pop * mult)) %>% 
+        mutate(lab = make_lab(var, denominador, id, den, pop, labn, nn, razao)) %>% 
+        mutate(razao = cortar(razao)) %>% 
+        mutate(lab = purrr::map(lab, htmltools::HTML)) %>% 
+        select(id, nn, razao, lab)
+      labs[[var]] <- labs[['razao']]
+      
+      map <- map[map@data$name %in% labs$id, ]
+      map@data %<>% inner_join(labs, c('name' = 'id'))
+      
+      
+      pal <- colorFactor('YlOrRd', NULL)
+      fpal <- as.formula(glue::glue('~pal({var})'))
+      leaflet(map) %>%
+        addTiles() %>% 
+        addPolygons(fillColor = fpal,
+                    color = 'black',
+                    fillOpacity = 0.6,
+                    weight = 2,
+                    label = map@data$lab,
+                    labelOptions = labelOptions(
+                      style = list("font-weight" = "normal", 
+                                   padding = "3px 8px"),
+                      textsize = "15px",
+                      direction = "auto"
+                    )) %>% 
+        addLegend(pal = pal, 
+                  title = var2,
+                  values = as.formula(paste0('~', var)),
+                  position = 'bottomright')
+    })  
+  }, error = function(x) message('Não há dados suficientes para montar o mapa.'))
 }
 
 
