@@ -1,4 +1,4 @@
-baseurl = "https://abjur.github.io/inacSite"
+baseurl = "/"
 title = "Monitor da Improbidade"
 theme = "hugo-tracks-theme"
 disqusShortname = "jurimetria"
@@ -6,15 +6,14 @@ googleAnalytics = ""
 ignoreFiles = ["\\.Rmd$"]
 
 [params]
-  description = "Describe your website"
+  description = ""
   copyright = "&copy;2017 ABJ"
   sidebarAbout = [
-    "INAC",
-    "INAC2."
-  ]
+    "O Instituto Não Aceito Corrupção é uma associação apartidária, sem fins lucrativos, fundada em julho de 2015. A entidade surgiu da articulação de um grupo de cidadãos que viu na crise política instalada a partir de junho de 2013, com os protestos de rua, uma oportunidade para transformar indignação em esforços estruturados para o enfrentamento da corrupção."
+]
 
   # Contact page
-  email = "contato@abj.org.br"
+  email = "relacionamento@abj.org.br"
 
   # Nav links in the side bar
   [[params.navlinks]]
@@ -34,15 +33,17 @@ ignoreFiles = ["\\.Rmd$"]
   url = "metodologia/"
   
   [[params.navlinks]]
+  name = "Dashboard"
+  url = "dashboard/"
+  
+  [[params.navlinks]]
   name = "Get in touch"
   url = "contato/"
   
   [params.social]
-  facebook      = "full page or profile url in facebook"
-  googleplus    = "full profile url in googleplus"
-  email         = "email@example.com"
-  twitter       = "full profile url in twitter"
-  linkedin      = "full profile url in linkedin"
-  stackoverflow = "full profile url in stackoverflow"
-  instagram     = "full profile url in instagram"
-  github        = "full profile url in github"
+  facebook      = "https://www.facebook.com/institutonaoaceitocorrupcao/"
+  email         = "contato@naoaceitocorrupcao.org.br"
+  twitter       = "https://twitter.com/InstitutoInac"
+  linkedin      = "https://www.linkedin.com/company-beta/10328094?pathWildcard=10328094"
+  instagram     = "https://www.instagram.com/naoaceitocorrupcao/"
+  github        = "https://github.com/abjur/cnc"
