@@ -16,7 +16,7 @@ library(lubridate)
 library(leaflet)
 library(cnc)
 load('env.rda')
-params <- eval(parse(text = 'structure(list(regiao = "", uf = NA_character_, esfera_processo = ""), .Names = c("regiao", "uf", "esfera_processo"))'))
+params <- eval(parse(text = 'structure(list(regiao = "Sul", uf = NA_character_, esfera_processo = ""), .Names = c("regiao", "uf", "esfera_processo"))'))
 ```
 
 ```{r echo=FALSE}
