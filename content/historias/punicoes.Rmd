@@ -292,9 +292,4 @@ Os mapas de probabilidade de perda de cargo e proibição de contratar o poder p
 multiplot(probabilidades_por_estado$teve_perda_cargo, probabilidades_por_estado$teve_proibicao)
 ```
 
-### Probabilidades
-
-```{r}
-#source()
-```
 
