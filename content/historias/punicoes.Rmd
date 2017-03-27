@@ -7,11 +7,12 @@ draft: false
 weight: 0
 ---
 
-```{r collapse = TRUE, eval = T, echo = F, error = F, message = F, comment = F}
+```{r}
 library(tidyverse)
 library(stringr)
 library(lubridate)
 library(forcats)
+
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
 
@@ -48,11 +49,6 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-knitr::opts_chunk$set(collapse = TRUE, 
-                      eval = T, echo = F, 
-                      error = F, message = F, 
-                      comment = F)
-
 data(tidy_cnc, package = 'cnc')
 data(br_uf_map, package = 'abjData')
 data(cadmun, package = 'abjData')
@@ -75,9 +71,12 @@ tidy_improb <- tidy_cnc %>%
 project_dir <- normalizePath("../..")
 
 source(sprintf("%s/R/add_uf_consolidado.R", project_dir))
+
+tidy_improb <- tidy_improb %>% 
+  mutate(teve_ressarcimento = vl_ressarcimento > 0)
 ```
 
-Os cadastrados do CNIA podem sofrer 7 tipos de punição.
+Os cadastrados do CNIA podem sofrer os 7 tipos de punição previstos na Lei 8.429/92.
 
 - Inelegibilidade.
 - Multa.
@@ -88,9 +87,10 @@ Os cadastrados do CNIA podem sofrer 7 tipos de punição.
 - Suspensão dos Direitos Políticos.
 - Proibição de Contratar com o Poder Público ou receber incentivos fiscais ou creditícios, direta ou indiretamente, ainda que por intermédio de pessoa jurídica da qual seja sócio majoritário.
 
+O ressarcimento integral do dano causado é a punição mais frequente, presente em 100% dos casos. Entretanto, em 20% das condenações o valor ressarcido é nulo. Nesses casos, consideramos que não houve ressarcimento. 
+
 ```{r}
 tidy_improb %>% 
-  mutate(teve_ressarcimento = vl_ressarcimento > 0) %>% 
   ungroup() %>% 
   select(dplyr::contains("teve")) %>% 
   gather(tipo_pena, teve) %>% 
@@ -102,22 +102,81 @@ tidy_improb %>%
   ungroup() %>% 
   mutate(tipo_pena2 = fct_reorder(tipo_pena2, -prop)) %>% 
   ggplot(aes(x = tipo_pena2, y = prop)) +
-  geom_bar(stat = 'identity', fill = 'royalblue', color = 'black') +
+  geom_bar(stat = 'identity', fill = '#fbb924', color = 'black') +
   theme_bw(15) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.65)) +
+  theme(axis.text.x = element_text(angle = 15, vjust = 0.65)) +
   scale_y_continuous(labels = scales::percent, minor_breaks = seq(.1, .7, .1)) +
   ylab("Proporção\nde aplicações") +
   xlab("Tipo de punição")
 ```
 
+Há uma grande intersecção entre as punições. Existem poucos casos em que aplica-se uma única punição, mas eles são majoritariamente probição de contratar o poder público e multas. Além disso, algumas punições estão aninhadas dentro de outras: só observa-se suspensão dos direito políticos em caso de inelegibilidade, e o mesmo se aplica para quase todos os casos de perda de cargo. 
+
+```{r}
+contagens <- tidy_improb %>% 
+  mutate(id = 1:n()) %>% 
+  group_by(id) %>% 
+  select(-teve_ressarcimento) %>% 
+  gather(key, val, teve_inelegivel, teve_perda_bens, teve_perda_cargo) %>%
+  filter(val) %>% 
+  mutate(key = str_to_title(str_extract(key[val],"[a-z]+$"))) %>% 
+  select(key) %>% 
+  ungroup()
+
+desenha_venn <- function(d){
+  truth_table <- VennDiagram:::make.truth.table(d)
+  
+  data <- vector("list", nrow(truth_table)-1)
+  
+  d <- as.data.frame(d)
+  
+  for(i in 1:(nrow(truth_table)-1)){
+    
+    print(i)
+    
+    k <- which(as.logical(truth_table[i,]))
+    set <- map(names(truth_table)[k], identity)
+    
+    count <- 0
+    for(j in 1:nrow(d)){
+      count <- count + all(d[j,k]==truth_table[i,k])
+    }
+    data[[i]] <- list(sets = set, size = count)
+  }
+  return(data)
+}
+
+d <- tidy_improb %>%
+  select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena) %>% 
+  count_(grep("teve",names(.), value = T)) %>% 
+  ungroup() 
+
+m <- as.matrix(d)
+
+somar <- function(cols) {
+  d %>% 
+    filter_(.dots = names(d)[cols]) %>% 
+    with(sum(n))
+}
+
+data2 <- d %>% 
+  mutate(n2 = apply(d, 1, somar))
+
+data <- desenha_venn(tidy_improb %>% select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena))
+d3vennR::d3vennR(data)
+```
+
 ### Punições versus Assuntos
+
+As proporções de tipos de punição mudam quando separadas por assunto do processo. As mudanças acontecem em dois padroês: diminuição na proporção de réus inelegíveis, nos casos de Ennriquericmento ilícito, Dano Ao Erário, Violação Aos Princípios Administrativos e Improbidade, e casos em que as proporções são praticamente as mesmas: Atos Administrativos, Agentes Políticos e Outros. Os processos com assunto "Servidor Público Civil" são um caso a parte: há inelegibilidade em todas as condenações, mas não observam-se as outras penas.
 
 ```{r}
 tidy_improb %>%
   mutate(assunto_nm_1 = fct_lump(assunto_nm_1,
-                                 prop = 0.05,
+                                 prop = 0.0005,
                                  other_level = "Outros") %>% 
-           str_to_title()) %>% 
+           str_to_title(),
+         assunto_nm_1 = ifelse(assunto_nm_1 == "Direito Administrativo E Outras Matérias De Direito Público", "Outros", assunto_nm_1)) %>% 
   ungroup() %>% 
   filter(vl_ressarcimento > 0, teve_ressarcimento) %>%
   gather(key, val, starts_with('teve_')) %>%
@@ -126,21 +185,25 @@ tidy_improb %>%
   summarise(prop = val[length(n)]*n[length(n)]/sum(n)) %>% 
   ungroup() %>%
   mutate(key = str_to_title(str_extract(key, "[a-z]+$")),
-         assunto = str_extract(assunto_nm_1, "^[A-Za-z]+"), 
+         #assunto = str_extract(assunto_nm_1, "^[A-Za-z]+"), 
+         assunto = str_wrap(assunto_nm_1,25),
          key = fct_reorder(key,-prop,mean)) %>%
   ggplot(aes(x = key, y = prop, fill = key)) +
   geom_bar(stat = 'identity', position = 'dodge') +
   #geom_point() +
-  theme_bw(15) +
+  theme_bw(12) +
   xlab("Quantil do ressarcimento") +
   ylab("Proporção de condenações") +
   scale_y_continuous(labels = scales::percent) +
   scale_colour_hue(name = 'Punição') +
-  theme(axis.text.x = element_text(angle = 90)) +
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position = 'none') +
   facet_wrap(~assunto)
 ```
 
 ### Punições versus Danos
+
+Se considerarmos que os danos patrimoniais ao Estado podem ser medidos pelo valor ressarcido nas condenações, vamos identificar que as proporp~oes de Inelegibilidade, Suspensão e Proibição aumentam com o valor do dano. Nos 10% maiores ressarcimentos (10º quantil), as taxas de Proibição, Suspensão e Inelegibilidade estão próximas de 75%. Nos 10% menores ressarcimentos, por outro lado, essas taxas beiram os 50%.
 
 ```{r}
 tidy_improb %>%
@@ -172,6 +235,8 @@ tidy_improb %>%
 
 ### Punições versus Pessoas
 
+A proporção de cada tipo de punição também muda quando separamos os processos em pessoas físicas e jurídicas. As proporções de Probição e Ressarcimento aumentam sensivelmente, mas as proporções de Suspensão dos Direitos Políticos, Inelegibilidade e Perda de Cargo caem vertiginosamente. Isso é esperado pois essas punições muitas vezes só podem ser aplicadas a pessoas jurídicas.
+
 ```{r}
 tidy_improb %>%
   mutate(teve_ressarcimento = vl_ressarcimento > 0) %>% 
@@ -195,8 +260,41 @@ tidy_improb %>%
     }
 ```
 
+### Distribuição geográfica: probabilidades
+
+Para identificar diferenças regionais nas probabilidades de cada tipo de condenação, ajustamos modelos que calculem as probabilidades em cada estado considerando o impacto das demais variáveis. Nossos modelos consideraram o tipo de pessoa sendo julgada, a esfera em que o processo correu, o assunto processual e os valores.
+
+```{r}
+source(sprintf("%s/R/modelos.R", project_dir))
+```
+
+Identificamos as probabilidades de Inelegibilidade mantém-se entre 50% e 70% para a maior parte dos estados, mas existem exceções. Os estados de Santa Catarina, Espírito Santo e Mato Grosso do Sul destoam dos demais com probabilidades que variam de 30% a 40%.
+
+```{r}
+probabilidades_por_estado$teve_inelegivel
+```
+
+Com relação à probabilidade de aplicação de multas, os estados são homogêneos, com probabilidades na maior parte dos casos indo de 60% a 70%. Destoam negativamente os estados do Acre e Roraima, com proporções de aplicação de multas de 40%.
+
+```{r}
+probabilidades_por_estado$teve_multa
+```
+
+As probabilidades básicas de perda de bens são muito pequenas, mas apresentam um padrão de crescimento do Norte pro Sul. São exceções od estados de Rondônia e Pernambuco.
+
+```{r}
+probabilidades_por_estado$teve_perda_bens
+```
+
+Os mapas de probabilidade de perda de cargo e proibição de contratar o poder público são parecidos, com exceção das quantidades numéricas. Ambos os mapas apresentam uma tendência de crescimento do Sul para o Norte.
+
+```{r}
+multiplot(probabilidades_por_estado$teve_perda_cargo, probabilidades_por_estado$teve_proibicao)
+```
+
 ### Probabilidades
 
 ```{r}
 #source()
 ```
+

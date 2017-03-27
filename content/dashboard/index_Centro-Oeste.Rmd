@@ -5,7 +5,8 @@ always_allow_html: yes
 ---
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
-source('/home/jtrecenti/abj/inacSite/R/scripts.R')
+wd <- normalizePath("../..")
+source(sprintf('%s/R/scripts.R',wd))
 # source('/home/jtrecenti/abj/inacSite/R/cnc-vis.R')
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(magrittr)

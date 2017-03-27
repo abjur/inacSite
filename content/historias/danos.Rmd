@@ -80,6 +80,19 @@ tidy_improb <- tidy_cnc %>%
 project_dir <- normalizePath("../..")
 
 source(sprintf("%s/R/add_uf_consolidado.R", project_dir))
+
+ipca <- readr::read_csv2(file = "../../R/ipca_var_percentual.csv") %>% 
+  setNames("ipca") %>% 
+  filter(stringr::str_detect(ipca,"[0-9]?[0-9],[0-9]{2}")) %>% 
+  mutate(data = as.Date("1993-12-01") + months(1:278)) %>% 
+  arrange(desc(data)) %>%
+  mutate(ipca = 1+as.numeric(gsub(",","\\.",ipca))/100,
+         ipca_acumulado = cumprod(ipca))
+
+tidy_improb <- tidy_improb %>% 
+  mutate(dt_pena_mes = floor_date(dt_pena, "month")) %>% 
+  left_join(ipca, by = c("dt_pena_mes" = "data")) %>% 
+  mutate(vl_ressarcimento = vl_ressarcimento*ipca_acumulado)
 ```
 
 ```{r}
@@ -99,7 +112,9 @@ tidy_ressarcimento_ano <- tidy_ressarcimento_sem_estranhos %>%
 
 ```
 
-Todo os anos, em média `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são condenadas por improbidade administrativa no Brasil. Aproximadamente `r scales::percent(nrow(tidy_ressarcimento)/nrow(tidy_improb))` dos condenados são obrigados a ressarcir integralmente os danos causados, que ao longo da história do CNIA já somam `r round(sum(tidy_ressarcimento_ano$ress)/10^6,0)` milhões de reais. Só em 2013 e 2014, a justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.
+Todo os anos, em média `r round(with(condenados_improb_ano, mean(n)),0)` pessoas são condenadas por improbidade administrativa no Brasil. Aproximadamente `r scales::percent(nrow(tidy_ressarcimento)/nrow(tidy_improb))` dos condenados são obrigados a ressarcir integralmente os danos causados, que ao longo da história do CNIA já somam `r round(sum(tidy_improb$vl_ressarcimento_atualizado)/10^6,0)` milhões de reais[^ipca]. Só em 2013 e 2014, a justiça brasileira já exigiu o ressarcimento de 350 milhões de reais.
+
+[^ipca]: Valores nominais atualizados até março de 2017 pelo IPCA.
 
 <!--more-->
 
