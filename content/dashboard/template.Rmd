@@ -246,3 +246,46 @@ sankeyNetwork(Links = links, Nodes = nodes, Source = "source",
               Target = "target", Value = "value", NodeID = "name",
               units = "", fontSize = 12, nodeWidth = 30)
 ```
+
+```{r}
+contagens <- tidy_improb %>% 
+  mutate(id = 1:n()) %>% 
+  group_by(id) %>% 
+  select(-teve_ressarcimento) %>% 
+  gather(key, val, teve_inelegivel, teve_perda_bens, teve_perda_cargo) %>%
+  filter(val) %>% 
+  mutate(key = str_to_title(str_extract(key[val],"[a-z]+$"))) %>% 
+  select(key) %>% 
+  ungroup()
+
+desenha_venn <- function(d){
+  truth_table <- VennDiagram:::make.truth.table(d)
+  
+  data <- vector("list", nrow(truth_table)-1)
+  
+  d <- as.data.frame(d)
+  
+  for(i in 1:(nrow(truth_table)-1)){
+    
+    k <- which(as.logical(truth_table[i,]))
+    set <- map(names(truth_table)[k], identity)
+    query <- paste0('`',names(truth_table)[k],"`",collapse =" & ")
+    
+    data[[i]] <- list(sets = set, size = nrow(filter_(d, .dots = query)))
+  }
+  return(data)
+}
+
+data <- tidy_improb %>% 
+  select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena) %>% 
+  setNames(muda_nome(names(.))) %>% 
+  desenha_venn()
+
+d3vennR::d3vennR(data)
+```
+
+```{r}
+tidy_improb %>% 
+  select(nm_pessoa, assunto_nm_1, orgao, cargo)
+```
+

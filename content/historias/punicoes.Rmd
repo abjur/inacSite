@@ -7,6 +7,17 @@ draft: false
 weight: 0
 ---
 
+```{r, echo = F}
+knitr::opts_chunk$set(collapse = TRUE, 
+                      eval = T, 
+                      echo = F, 
+                      message = F, 
+                      comment = F, 
+                      warning = F,
+                      include = T)
+```
+
+
 ```{r}
 library(tidyverse)
 library(stringr)
@@ -49,6 +60,20 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
+muda_nome <- function(nomes){
+  res <- nomes
+  res[which(nomes == "teve_inelegivel")] <- "Inelegibilidade"
+  res[which(nomes == "teve_multa")] <- "Multa"
+  res[which(nomes == "teve_pena")] <- "Reclusão"
+  res[which(nomes == "teve_perda_bens")] <- "Perda de Bens"
+  res[which(nomes == "teve_perda_cargo")] <- "Perda de Cargo"
+  res[which(nomes == "teve_proibicao")] <- "Proibição"
+  res[which(nomes == "teve_ressarcimento")] <- "Ressarcimento"
+  res[which(nomes == "teve_suspensao")] <- "Suspensão dos Direitos Políticos"
+  
+  return(res)
+}
+
 data(tidy_cnc, package = 'cnc')
 data(br_uf_map, package = 'abjData')
 data(cadmun, package = 'abjData')
@@ -87,7 +112,6 @@ Os cadastrados do CNIA podem sofrer os 7 tipos de punição previstos na Lei 8.4
 - Suspensão dos Direitos Políticos.
 - Proibição de Contratar com o Poder Público ou receber incentivos fiscais ou creditícios, direta ou indiretamente, ainda que por intermédio de pessoa jurídica da qual seja sócio majoritário.
 
-O ressarcimento integral do dano causado é a punição mais frequente, presente em 100% dos casos. Entretanto, em 20% das condenações o valor ressarcido é nulo. Nesses casos, consideramos que não houve ressarcimento. 
 
 ```{r}
 tidy_improb %>% 
@@ -110,7 +134,8 @@ tidy_improb %>%
   xlab("Tipo de punição")
 ```
 
-Há uma grande intersecção entre as punições. Existem poucos casos em que aplica-se uma única punição, mas eles são majoritariamente probição de contratar o poder público e multas. Além disso, algumas punições estão aninhadas dentro de outras: só observa-se suspensão dos direito políticos em caso de inelegibilidade, e o mesmo se aplica para quase todos os casos de perda de cargo. 
+O ressarcimento integral do dano causado é a punição mais frequente, presente em 100% dos casos, mesmo que em 80% deles o valor ressarcido seja 0, conforme indica o gráfico acima. Além disso, há uma grande intersecção entre as punições. Existem poucos casos em que aplica-se uma única sanção, mas quando isso acontece é mais comum que os condenados sejam probidos de contratar o poder público ou sejam obrigado a pagar multas. As intersecções são tão grandes que algumas punições estão aninhadas dentro de outras: só observa-se suspensão dos direito políticos em caso de inelegibilidade, e o mesmo se aplica para quase todos os casos de perda de cargo. 
+ <!--Entretanto, em 20% das condenações o valor ressarcido é nulo. Nesses casos, consideramos que não houve ressarcimento.--> 
 
 ```{r}
 contagens <- tidy_improb %>% 
@@ -123,6 +148,7 @@ contagens <- tidy_improb %>%
   select(key) %>% 
   ungroup()
 
+
 desenha_venn <- function(d){
   truth_table <- VennDiagram:::make.truth.table(d)
   
@@ -132,43 +158,23 @@ desenha_venn <- function(d){
   
   for(i in 1:(nrow(truth_table)-1)){
     
-    print(i)
-    
     k <- which(as.logical(truth_table[i,]))
     set <- map(names(truth_table)[k], identity)
+    query <- paste0('`',names(truth_table)[k],"`",collapse =" & ")
     
-    count <- 0
-    for(j in 1:nrow(d)){
-      count <- count + all(d[j,k]==truth_table[i,k])
-    }
-    data[[i]] <- list(sets = set, size = count)
+    data[[i]] <- list(sets = set, size = nrow(filter_(d, .dots = query)))
   }
   return(data)
 }
 
-d <- tidy_improb %>%
+data <- tidy_improb %>% 
   select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena) %>% 
-  count_(grep("teve",names(.), value = T)) %>% 
-  ungroup() 
-
-m <- as.matrix(d)
-
-somar <- function(cols) {
-  d %>% 
-    filter_(.dots = names(d)[cols]) %>% 
-    with(sum(n))
-}
-
-data2 <- d %>% 
-  mutate(n2 = apply(d, 1, somar))
-
-data <- desenha_venn(tidy_improb %>% select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena))
+  setNames(muda_nome(names(.))) %>% 
+  desenha_venn()
 d3vennR::d3vennR(data)
 ```
 
-### Punições versus Assuntos
-
-As proporções de tipos de punição mudam quando separadas por assunto do processo. As mudanças acontecem em dois padroês: diminuição na proporção de réus inelegíveis, nos casos de Ennriquericmento ilícito, Dano Ao Erário, Violação Aos Princípios Administrativos e Improbidade, e casos em que as proporções são praticamente as mesmas: Atos Administrativos, Agentes Políticos e Outros. Os processos com assunto "Servidor Público Civil" são um caso a parte: há inelegibilidade em todas as condenações, mas não observam-se as outras penas.
+As proporções de tipos de punição mudam quando separadas por assunto do processo. Com relação a isso, pdoemos separar os processos em dois grupos: aqueles com proporção de réus inelegíbels próxima de 50%, nos casos de Enriquericmento ilícito, Dano Ao Erário, Violação Aos Princípios Administrativos e Improbidade, e os casos em que essa proporção está próxima de 70%, nos casos de Atos Administrativos, Agentes Políticos e Outros. No primeiro grupo estão os processos com menores taxas, que no máximo atingem 75%, enquanto no segundo grupo estão aqueles processos com altas taxas de condenação. Também vale a pena notar duas outras coisas: a taxa de perda de cargo, que costuma ser 25% na maior parte dos tipos processuais do CNCIAI, bate 50% em processos de Agentes Políticos; e os processos relacionados a Servidores Públicos são bastante diferentes dos demais. 
 
 ```{r}
 tidy_improb %>%
@@ -201,9 +207,7 @@ tidy_improb %>%
   facet_wrap(~assunto)
 ```
 
-### Punições versus Danos
-
-Se considerarmos que os danos patrimoniais ao Estado podem ser medidos pelo valor ressarcido nas condenações, vamos identificar que as proporp~oes de Inelegibilidade, Suspensão e Proibição aumentam com o valor do dano. Nos 10% maiores ressarcimentos (10º quantil), as taxas de Proibição, Suspensão e Inelegibilidade estão próximas de 75%. Nos 10% menores ressarcimentos, por outro lado, essas taxas beiram os 50%.
+Outro fator determinante das proporções de condenação é o tamanho do dano patrimonial causado ao Estado. Medindo essa quantidade pelo valor ressarcido nas condenações, identificamos que as proporções de Inelegibilidade, Suspensão e Proibição aumentam junto o valor do dano. Nos 10% maiores ressarcimentos (10º quantil), as taxas de Proibição, Suspensão e Inelegibilidade estão próximas de 75%. Nos 10% menores ressarcimentos, por outro lado, essas taxas beiram os 50%. O mesmo raciocínio não se aplica a Perda de Bens, Perda de Cargo e Multa, que sofrem variações muito pequenas quando variamos o quantil de ressarcimento.
 
 ```{r}
 tidy_improb %>%
@@ -219,7 +223,7 @@ tidy_improb %>%
   mutate(prop = n / total) %>%
   ungroup() %>%
   mutate(vl_ressarcimento_class = as.numeric(vl_ressarcimento_class),
-         key = str_to_title(str_extract(key, "[a-z]+$")),
+         key = str_to_title(muda_nome(key)),
          key = fct_reorder(key,-prop,mean)) %>%
   filter(prop < 1) %>% 
   ggplot(aes(x = vl_ressarcimento_class, y = prop, col = key)) +
@@ -233,9 +237,16 @@ tidy_improb %>%
   scale_colour_hue(name = 'Punição')
 ```
 
-### Punições versus Pessoas
+```{r}
+tidy_improb %>% 
+  filter(vl_ressarcimento > 0, teve_ressarcimento, teve_multa) %>%
+  mutate(vl_ressarcimento_class = cut(vl_ressarcimento, quantile(vl_ressarcimento,cumsum(c(0,rep(0.05,20)))), labels = F)) %>% 
+  ggplot(aes(x = vl_ressarcimento, y = vl_multa)) +
+  geom_point()
+  
+```
 
-A proporção de cada tipo de punição também muda quando separamos os processos em pessoas físicas e jurídicas. As proporções de Probição e Ressarcimento aumentam sensivelmente, mas as proporções de Suspensão dos Direitos Políticos, Inelegibilidade e Perda de Cargo caem vertiginosamente. Isso é esperado pois essas punições muitas vezes só podem ser aplicadas a pessoas jurídicas.
+A proporção de cada tipo de punição também muda quando separamos os processos em pessoas físicas e jurídicas. As proporções de Probição e Ressarcimento aumentam sensivelmente, mas as proporções de Suspensão dos Direitos Políticos, Inelegibilidade e Perda de Cargo caem vertiginosamente. Isso é esperado pois essas punições muitas vezes só podem ser aplicadas em pessoas jurídicas.
 
 ```{r}
 tidy_improb %>%
@@ -243,7 +254,7 @@ tidy_improb %>%
   select(starts_with("teve_"), tipo_pessoa) %>% 
   gather(tipo_pena, teve, starts_with('teve_')) %>%
   filter(tipo_pena != "teve_pena") %>% 
-  mutate(tipo_pena = str_to_title(str_extract(tipo_pena, '[a-z]+$'))) %>% 
+  mutate(tipo_pena = str_to_title(muda_nome(tipo_pena))) %>% 
   count(tipo_pessoa, tipo_pena, teve) %>%
   group_by(tipo_pessoa, tipo_pena) %>% 
   summarise(prop = n[2] / sum(n)) %>%
@@ -260,11 +271,9 @@ tidy_improb %>%
     }
 ```
 
-### Distribuição geográfica: probabilidades
+Para identificar diferenças regionais nas probabilidades de cada tipo de condenação, calculamos as probabilidades de condenação em cada estado considerando o impacto das demais variáveis. Nossos modelos consideraram o tipo de pessoa sendo julgada, a esfera em que o processo correu, o assunto processual e os valores envolvidos.
 
-Para identificar diferenças regionais nas probabilidades de cada tipo de condenação, ajustamos modelos que calculem as probabilidades em cada estado considerando o impacto das demais variáveis. Nossos modelos consideraram o tipo de pessoa sendo julgada, a esfera em que o processo correu, o assunto processual e os valores.
-
-```{r}
+```{r, include=F}
 source(sprintf("%s/R/modelos.R", project_dir))
 ```
 

@@ -63,8 +63,8 @@ ajusta <- function(yvar, xvar, inter, dataset, method = 'meanfield'){
     fun <- formula(paste0(yvar,"~",x," + ",inter))
   }
   
-  stan_glm(fun, family = binomial(link = 'logit'),
-           data = data_to_fit, algorithm = method)
+  invisible(stan_glm(fun, family = binomial(link = 'logit'),
+           data = data_to_fit, algorithm = method, verbose = F))
 }
 
 probability_map <- function(response_var, model_list){

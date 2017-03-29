@@ -1,0 +1,153 @@
+---
+title: "Tempos"
+image: "img/portfolio/img1_crop.png"
+date: 2015-07-23T21:13:14-05:00
+categories: ["Monitor da improbidade"]
+draft: false
+weight: 0
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, 
+                      eval = T, 
+                      echo = F, 
+                      message = F, 
+                      comment = F, 
+                      warning = F,
+                      include = T)
+```
+
+```{r}
+library(tidyverse)
+library(stringr)
+library(lubridate)
+library(forcats)
+
+data(tidy_cnc, package = 'cnc')
+data(br_uf_map, package = 'abjData')
+data(cadmun, package = 'abjData')
+data(pnud_uf, package = 'abjData')
+
+cadmun %<>% distinct(cod, uf) %>% mutate_all(as.character)
+pnud_uf %<>% filter(ano == 2010) %>% 
+  select(uf, ufn, popt) %>% 
+  mutate(uf = as.character(uf)) %>% 
+  inner_join(cadmun, c('uf' = 'cod')) %>% 
+  select(id = uf.y, ufn, popt)
+
+tidy_improb <- tidy_cnc %>% 
+  filter(tipo_pena == "Trânsito em julgado",
+         !assunto_penal_any, 
+         year(dt_pena) >= 2009,
+         year(dt_pena) <= 2015,
+         vl_ressarcimento <= 5.877361e+07)
+
+project_dir <- normalizePath("../..")
+
+source(sprintf("%s/R/add_uf_consolidado.R", project_dir))
+
+muda_nome <- function(nomes){
+  res <- nomes
+  res[which(nomes == "teve_inelegivel")] <- "Inelegibilidade"
+  res[which(nomes == "teve_multa")] <- "Multa"
+  res[which(nomes == "teve_pena")] <- "Reclusão"
+  res[which(nomes == "teve_perda_bens")] <- "Perda de Bens"
+  res[which(nomes == "teve_perda_cargo")] <- "Perda de Cargo"
+  res[which(nomes == "teve_proibicao")] <- "Proibição"
+  res[which(nomes == "teve_ressarcimento")] <- "Ressarcimento"
+  res[which(nomes == "teve_suspensao")] <- "Suspensão dos Direitos Políticos"
+  
+  return(res)
+}
+
+tidy_improb <- tidy_improb %>% 
+  mutate(teve_ressarcimento = vl_ressarcimento > 0,
+         tempo_julgamento = dt_pena-dt_propositura) 
+```
+
+As condenações definitivas demoram, em média, `r round(mean(tidy_improb$tempo_julgamento)/365)` anos para acabar. A distribuição dos tempos de condenação não varia quando separado pelas demais variáveis do cadastro. Prefeitos, vereadores e demais servidores públicos demoram o mesmo tempo para serem condenados, e o mesmo vale para os órgãos atingidos.
+
+
+```{r}
+lista_de_regex <- list(regex_vereadores = regex("vereadores|c[âaâã}]mara", ignore_case = T),
+regex_secretaria = regex("secretaria", ignore_case = T),
+regex_municipio = regex("munic[íi]pio", ignore_case = T),
+regex_prefeitura = regex("prefeit", ignore_case = T),
+regex_assembleia_legislativa = regex("assembl[ée]ia legis", ignore_case = T),
+regex_policia = regex("pol[íi]cia", ignore_case = T),
+regex_poder_executivo = regex("executivo|poder executivo", ignore_case = T),
+regex_poder_legislativo = regex("poder legislativo", ignore_case = T),
+regex_hospital = regex("hospitais", ignore_case = T),
+regex_correios = regex("correio|ect|ebct", ignore_case = T),
+regex_caixa = regex("CAIXA ECON[Ôo]MICA FEDERAL|cef", ignore_case = T),
+regex_inss = regex("INSTITUTO NACIONAL DO SEGURO|INSS", ignore_case = T))
+
+joga_resto_no_outros <- function(string, N, labell = 'outros'){
+
+d <- data_frame(coluna = string)
+
+left_join(d, y = d %>% count(coluna), by = 'coluna') %>% 
+  mutate(coluna = ifelse(n < N, labell, coluna)) %>% 
+  with(coluna)
+}
+
+troca_string_por_regex <- function(vetor, regexes){
+  map_chr(vetor, function(x){
+       pareamentos <- map(regexes, str_detect, string = x) %>% 
+       keep(~.x) %>% 
+       names %>% 
+       paste(collapse = ', ')
+      
+       if(pareamentos == ''){pareamentos <- x}
+       return(pareamentos)
+  })
+}
+
+tidy_improb <-  tidy_improb %>% 
+  mutate(novo_orgao = troca_string_por_regex(orgao, lista_de_regex),
+         novo_orgao = joga_resto_no_outros(novo_orgao, 5),
+         novo_orgao = str_replace_all(novo_orgao,"regex_",""),
+         novo_orgao = str_replace_all(novo_orgao,"_"," "),
+         novo_orgao = str_to_title(novo_orgao)) %>% 
+  replace_na(list(novo_orgao = "Não Identificado"))
+
+tidy_improb %>% 
+  ggplot(aes(x = tempo_julgamento)) +
+  geom_histogram() +
+  facet_wrap(~novo_orgao, scale = 'free')
+```
+
+```{r}
+tidy_improb %>% 
+  mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros"),
+         assunto_nm_1 = str_to_title(assunto_nm_1)) %>% 
+  ggplot(aes(x = tempo_julgamento)) +
+  geom_histogram() +
+  facet_wrap(~assunto_nm_1, scale = 'free')
+```
+
+```{r}
+tidy_improb %>% 
+  mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros"),
+         assunto_nm_1 = str_to_title(assunto_nm_1)) %>% 
+  ggplot(aes(x = tempo_julgamento)) +
+  geom_histogram() +
+  facet_wrap(~assunto_nm_1, scale = 'free')
+```
+
+As invariâncias seguem quando separamos os processos pelo tipo de condenação aplicada.
+
+```{r}
+tidy_improb %>% 
+  select(tempo_julgamento, dplyr::contains("teve_"),
+         -teve_ressarcimento, -teve_pena) %>% 
+  gather(key, val, -tempo_julgamento) %>% 
+  filter(val) %>% 
+  mutate(key = muda_nome(key)) %>% 
+  ggplot(aes(x = tempo_julgamento)) +
+  geom_histogram() +
+  facet_wrap(~key, scale = 'free')
+```
+
+
+
