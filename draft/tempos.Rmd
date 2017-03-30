@@ -1,6 +1,6 @@
 ---
 title: "Tempos"
-image: "img/portfolio/a4-paper.jpg"
+image: "img/portfolio/tempos.jpg"
 date: 2015-07-23T21:13:14-05:00
 categories: ["Monitor da improbidade"]
 draft: false
