@@ -50,7 +50,12 @@ purrr::walk2(params, nms, ~{
   l <- stringr::str_replace(readr::read_file(rmd), 
                             stringr::fixed(txt), 
                             deparse(.x, width.cutoff = 200))
-  cat(l, file = glue::glue("{dirname(rmd)}/{.y}"))
+  ff <- glue::glue("{dirname(rmd)}/{.y}")
+  cat(l, file = ff)
+  # old_wd <- getwd()
+  # setwd(dirname(rmd))
+  # rmarkdown::render(ff)
+  # setwd(old_wd)
 })
 ### 
 
