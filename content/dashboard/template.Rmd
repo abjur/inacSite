@@ -186,11 +186,262 @@ create_map(cnc_vis, 'vl_ressarcimento', g2, denominador = 'pop', fun = function(
 create_map(cnc_vis, 'vl_multa', g2, denominador = 'pop', fun = function(x) sum(x, na.rm = TRUE))
 ```
 
+<!-- Tabelas ----------------------------------------------------------------->
+
+## Tempos {.tabset .tabset-sticky}
+
+```{r}
+resumir <- function(x) {
+  c(n = length(x),
+    n_na = sum(is.na(x)),
+    media = mean(x, na.rm = TRUE),
+    dp = sd(x, na.rm = TRUE),
+    min = min(x, na.rm = TRUE),
+    qt = quantile(x, .25, na.rm = TRUE),
+    mediana = median(x, na.rm = TRUE),
+    qt = quantile(x, .75, na.rm = TRUE),
+    max = max(x, na.rm = TRUE)) %>% 
+    enframe() %>% 
+    mutate(name = factor(name, levels = name))
+}
+grupos <- c('instancia', 'esfera_processo')
+tabela_tempos <- function(d, ..., tipo = 'all') {
+  l <- lazyeval::lazy_dots(...)
+  v <- as.character(purrr::transpose(l)$expr)
+  dx <- d %>% 
+    mutate(tempo = as.numeric(dt_condenacao - dt_propositura, units = 'days'))
+  if (tipo == 'duracao_proibicao') dx$tempo <- dx$duracao_proibicao
+  if (tipo == 'duracao_suspensao') dx$tempo <- dx$duracao_suspensao
+  tab1 <- dx %>%     
+    group_by_(.dots = l) %>% 
+    do(resumir(.$tempo)) %>% 
+    mutate(value = round(value)) %>% 
+    spread(name, value) %>% 
+    ungroup() %>% 
+    arrange(desc(n))
+  tab2 <- dx %>%
+    do(resumir(.$tempo)) %>%
+    mutate(value = round(value)) %>%
+    spread(name, value) %>%
+    ungroup()
+  res <- bind_rows(tab1, tab2)
+  res[[v[1]]][nrow(res)] <- 'Total'
+  res
+}
+```
+
+### Processo
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(uf_processo) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
+
+### Proibição
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'duracao_proibicao', uf_processo) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+### Suspensão
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'duracao_suspensao', uf_processo) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+## Valores {.tabset .tabset-sticky}
+
+```{r}
+resumir <- function(x) {
+  c(n = length(x),
+    n_na = sum(is.na(x)),
+    media = mean(x, na.rm = TRUE),
+    dp = sd(x, na.rm = TRUE),
+    min = min(x, na.rm = TRUE),
+    qt = quantile(x, .25, na.rm = TRUE),
+    mediana = median(x, na.rm = TRUE),
+    qt = quantile(x, .75, na.rm = TRUE),
+    max = max(x, na.rm = TRUE)) %>% 
+    enframe() %>% 
+    mutate(name = factor(name, levels = name))
+}
+grupos <- c('instancia', 'esfera_processo')
+tabela_tempos <- function(d, ..., tipo = 'all') {
+  l <- lazyeval::lazy_dots(...)
+  v <- as.character(purrr::transpose(l)$expr)
+  dx <- d %>% 
+    mutate(tempo = as.numeric(dt_condenacao - dt_propositura, units = 'days'))
+  if (tipo == 'vl_multa') dx$tempo <- dx$vl_multa
+  if (tipo == 'vl_perda_bens') dx$tempo <- dx$vl_perda_bens
+  if (tipo == 'vl_ressarcimento') dx$tempo <- dx$vl_ressarcimento
+  tab1 <- dx %>%     
+    group_by_(.dots = l) %>% 
+    do(resumir(.$tempo)) %>% 
+    mutate(value = round(value)) %>% 
+    spread(name, value) %>% 
+    ungroup() %>% 
+    arrange(desc(n))
+  tab2 <- dx %>%
+    do(resumir(.$tempo)) %>%
+    mutate(value = round(value)) %>%
+    spread(name, value) %>%
+    ungroup()
+  res <- bind_rows(tab1, tab2)
+  res[[v[1]]][nrow(res)] <- 'Total'
+  res
+}
+
+```
+
+### Multa
+
+```{r}
+library(scales)
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'vl_multa', uf_processo) %>% 
+  mutate_at(vars(media:max), funs(dollar)) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+### Ressarcimento
+
+```{r}
+library(scales)
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'vl_ressarcimento', uf_processo) %>% 
+  mutate_at(vars(media:max), funs(dollar)) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+### Perda de bens
+
+```{r}
+library(scales)
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'vl_perda_bens', uf_processo) %>% 
+  mutate_at(vars(media:max), funs(dollar)) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
 <!-- CONDENACOES ------------------------------------------------------------->
 
 ## Condenações
 
+### Assuntos
+
+Tabela descritiva das 5 combinações de assuntos com maior volume de condenações. A coluna condenação mostra a condenação mais frequente.
+
 ```{r}
+cnc_vis %>% 
+  filter(teve_all != '') %>%
+  group_by(assunto_nm_all) %>% 
+  summarise(n = n(),
+            vl_multa = mean(vl_multa, na.rm=T),
+            vl_ressarcimento = mean(vl_ressarcimento, na.rm=T),
+            tempo = mean(tempo_condenacao, na.rm=T),
+            condenacao = names(table(teve_all))[which.max(table(teve_all))],
+            n_condenacao = table(teve_all)[which.max(table(teve_all))]) %>%
+  mutate(condenacao = str_replace_all(condenacao, ',', ', ')) %>% 
+  mutate(n_condenacao = sprintf('%s (%s)',
+                                n_condenacao, 
+                                scales::percent(n_condenacao/n))) %>% 
+  arrange(desc(n)) %>% 
+  head(5) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
+
+### Diagrama de Venn das condenações
+
+```{r}
+# contagens <- cnc_vis %>% 
+#   mutate(id = 1:n()) %>% 
+#   group_by(id) %>% 
+#   select(-teve_ressarcimento) %>% 
+#   gather(key, val, teve_inelegivel, teve_perda_bens, teve_perda_cargo, -teve_all) %>%
+#   filter(!is.na(val)) %>% 
+#   mutate(key = str_to_title(str_extract(key[val],"[a-z]+$"))) %>% 
+#   select(key) %>% 
+#   ungroup()
+muda_nome <- function(nomes){
+  res <- nomes
+  res[which(nomes == "teve_inelegivel")] <- "Inelegibilidade"
+  res[which(nomes == "teve_multa")] <- "Multa"
+  res[which(nomes == "teve_pena")] <- "Reclusão"
+  res[which(nomes == "teve_perda_bens")] <- "Perda de Bens"
+  res[which(nomes == "teve_perda_cargo")] <- "Perda de Cargo"
+  res[which(nomes == "teve_proibicao")] <- "Proibição"
+  res[which(nomes == "teve_ressarcimento")] <- "Ressarcimento"
+  res[which(nomes == "teve_suspensao")] <- "Suspensão dos Direitos Políticos"
+  
+  return(res)
+}
+
+desenha_venn <- function(d){
+  truth_table <- VennDiagram:::make.truth.table(d)
+  
+  data <- vector("list", nrow(truth_table)-1)
+  
+  d <- as.data.frame(d)
+  
+  for(i in 1:(nrow(truth_table)-1)){
+    
+    k <- which(as.logical(truth_table[i,]))
+    set <- map(names(truth_table)[k], identity)
+    query <- paste0('`',names(truth_table)[k],"`",collapse =" & ")
+    
+    data[[i]] <- list(sets = set, size = nrow(filter_(d, .dots = query)))
+  }
+  return(data)
+}
+
+
+data <- cnc_vis %>% 
+  select(dplyr::contains("teve"), -teve_ressarcimento, -teve_all) %>% 
+  setNames(muda_nome(names(.))) %>% 
+  mutate_all(funs(!is.na(.))) %>% 
+  desenha_venn()
+
+d3vennR::d3vennR(data)
+```
+
+```{r eval=F}
+unloadNamespace('d3vennR')
 library(networkD3)
 tab_count1 <- cnc_vis %>% 
   filter(teve_all != '') %>% 
@@ -245,47 +496,5 @@ links <- tab_count %>%
 sankeyNetwork(Links = links, Nodes = nodes, Source = "source",
               Target = "target", Value = "value", NodeID = "name",
               units = "", fontSize = 12, nodeWidth = 30)
-```
-
-```{r}
-contagens <- tidy_improb %>% 
-  mutate(id = 1:n()) %>% 
-  group_by(id) %>% 
-  select(-teve_ressarcimento) %>% 
-  gather(key, val, teve_inelegivel, teve_perda_bens, teve_perda_cargo) %>%
-  filter(val) %>% 
-  mutate(key = str_to_title(str_extract(key[val],"[a-z]+$"))) %>% 
-  select(key) %>% 
-  ungroup()
-
-desenha_venn <- function(d){
-  truth_table <- VennDiagram:::make.truth.table(d)
-  
-  data <- vector("list", nrow(truth_table)-1)
-  
-  d <- as.data.frame(d)
-  
-  for(i in 1:(nrow(truth_table)-1)){
-    
-    k <- which(as.logical(truth_table[i,]))
-    set <- map(names(truth_table)[k], identity)
-    query <- paste0('`',names(truth_table)[k],"`",collapse =" & ")
-    
-    data[[i]] <- list(sets = set, size = nrow(filter_(d, .dots = query)))
-  }
-  return(data)
-}
-
-data <- tidy_improb %>% 
-  select(dplyr::contains("teve"), -teve_ressarcimento, -teve_pena) %>% 
-  setNames(muda_nome(names(.))) %>% 
-  desenha_venn()
-
-d3vennR::d3vennR(data)
-```
-
-```{r}
-tidy_improb %>% 
-  select(nm_pessoa, assunto_nm_1, orgao, cargo)
 ```
 
