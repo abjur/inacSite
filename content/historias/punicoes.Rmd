@@ -1,6 +1,6 @@
 ---
 title: "Punições"
-image: "img/portfolio/img1_crop.png"
+image: "img/portfolio/punicoes.png"
 date: 2015-07-23T21:13:14-05:00
 categories: ["Monitor da improbidade"]
 draft: false
@@ -237,7 +237,7 @@ tidy_improb %>%
   scale_colour_hue(name = 'Punição')
 ```
 
-```{r}
+```{r eval=F}
 tidy_improb %>% 
   filter(vl_ressarcimento > 0, teve_ressarcimento, teve_multa) %>%
   mutate(vl_ressarcimento_class = cut(vl_ressarcimento, quantile(vl_ressarcimento,cumsum(c(0,rep(0.05,20)))), labels = F)) %>% 
