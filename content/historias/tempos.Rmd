@@ -1,6 +1,6 @@
 ---
 title: "Tempos"
-image: "img/portfolio/img1_crop.png"
+image: "img/portfolio/tempos.png"
 date: 2015-07-23T21:13:14-05:00
 categories: ["Monitor da improbidade"]
 draft: false
@@ -63,10 +63,15 @@ muda_nome <- function(nomes){
 tidy_improb <- tidy_improb %>% 
   mutate(teve_ressarcimento = vl_ressarcimento > 0,
          tempo_julgamento = dt_pena-dt_propositura) 
+load('env.rda')
+cnc_vis$tempo_julgamento <- cnc_vis$tempo_condenacao
+cnc_vis <- cnc_vis %>% 
+  filter(!is.na(tempo_julgamento))
+tidy_improb <- cnc_vis
+
 ```
 
-As condenações definitivas demoram, em média, `r round(mean(tidy_improb$tempo_julgamento)/365)` anos para acabar. A distribuição dos tempos de condenação não varia quando separado pelas demais variáveis do cadastro. Prefeitos, vereadores e demais servidores públicos demoram o mesmo tempo para serem condenados, e o mesmo vale para os órgãos atingidos.
-
+As condenações definitivas demoram, em média, `r round(mean(tidy_improb$tempo_julgamento)/365)` anos para acabar. A distribuição dos tempos de condenação não varia quando separado pelas demais características dos condenados. Prefeitos, vereadores e demais servidores públicos demoram o mesmo tempo para serem condenados, e o mesmo vale para os órgãos atingidos.
 
 ```{r}
 lista_de_regex <- list(regex_vereadores = regex("vereadores|c[âaâã}]mara", ignore_case = T),
@@ -103,21 +108,21 @@ troca_string_por_regex <- function(vetor, regexes){
   })
 }
 
-tidy_improb <-  tidy_improb %>% 
-  mutate(novo_orgao = troca_string_por_regex(orgao, lista_de_regex),
-         novo_orgao = joga_resto_no_outros(novo_orgao, 5),
-         novo_orgao = str_replace_all(novo_orgao,"regex_",""),
-         novo_orgao = str_replace_all(novo_orgao,"_"," "),
-         novo_orgao = str_to_title(novo_orgao)) %>% 
-  replace_na(list(novo_orgao = "Não Identificado"))
-
-tidy_improb %>% 
-  ggplot(aes(x = tempo_julgamento)) +
-  geom_histogram() +
-  facet_wrap(~novo_orgao, scale = 'free')
+# tidy_improb <-  tidy_improb %>% 
+#   mutate(novo_orgao = troca_string_por_regex(orgao, lista_de_regex),
+#          novo_orgao = joga_resto_no_outros(novo_orgao, 5),
+#          novo_orgao = str_replace_all(novo_orgao,"regex_",""),
+#          novo_orgao = str_replace_all(novo_orgao,"_"," "),
+#          novo_orgao = str_to_title(novo_orgao)) %>% 
+#   replace_na(list(novo_orgao = "Não Identificado"))
+# 
+# tidy_improb %>% 
+#   ggplot(aes(x = tempo_julgamento)) +
+#   geom_histogram() +
+#   facet_wrap(~novo_orgao, scale = 'free')
 ```
 
-```{r}
+```{r eval=F}
 tidy_improb %>% 
   mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros"),
          assunto_nm_1 = str_to_title(assunto_nm_1)) %>% 
@@ -126,7 +131,7 @@ tidy_improb %>%
   facet_wrap(~assunto_nm_1, scale = 'free')
 ```
 
-```{r}
+```{r eval=F}
 tidy_improb %>% 
   mutate(assunto_nm_1 = fct_lump(assunto_nm_1, prop = 0.05, other_level = "Outros"),
          assunto_nm_1 = str_to_title(assunto_nm_1)) %>% 
@@ -137,17 +142,159 @@ tidy_improb %>%
 
 As invariâncias seguem quando separamos os processos pelo tipo de condenação aplicada.
 
-```{r}
+```{r fig.width=8}
 tidy_improb %>% 
   select(tempo_julgamento, dplyr::contains("teve_"),
-         -teve_ressarcimento, -teve_pena) %>% 
+         -teve_ressarcimento, -teve_all) %>% 
   gather(key, val, -tempo_julgamento) %>% 
-  filter(val) %>% 
+  filter(!is.na(val)) %>% 
   mutate(key = muda_nome(key)) %>% 
   ggplot(aes(x = tempo_julgamento)) +
-  geom_histogram() +
-  facet_wrap(~key, scale = 'free')
+  geom_histogram(bins = 30, colour = 'black', alpha = .6) +
+  facet_wrap(~key, scale = 'free') +
+  theme_bw(14) +
+  labs(x = 'Tempo de julgamento')
 ```
 
+```{r}
+resumir <- function(x) {
+  c(n = length(x),
+    n_na = sum(is.na(x)),
+    media = mean(x, na.rm = TRUE),
+    dp = sd(x, na.rm = TRUE),
+    min = min(x, na.rm = TRUE),
+    qt = quantile(x, .25, na.rm = TRUE),
+    mediana = median(x, na.rm = TRUE),
+    qt = quantile(x, .75, na.rm = TRUE),
+    max = max(x, na.rm = TRUE)) %>% 
+    enframe() %>% 
+    mutate(name = factor(name, levels = name))
+}
+grupos <- c('instancia', 'esfera_processo')
+tabela_tempos <- function(d, ..., tipo = 'all') {
+  l <- lazyeval::lazy_dots(...)
+  v <- as.character(purrr::transpose(l)$expr)
+  dx <- d %>% 
+    mutate(tempo = as.numeric(dt_condenacao - dt_propositura, units = 'days'))
+  if (tipo == 'duracao_proibicao') dx$tempo <- dx$duracao_proibicao
+  if (tipo == 'duracao_suspensao') dx$tempo <- dx$duracao_suspensao
+  tab1 <- dx %>%     
+    group_by_(.dots = l) %>% 
+    do(resumir(.$tempo)) %>% 
+    mutate(value = round(value)) %>% 
+    spread(name, value) %>% 
+    ungroup() %>% 
+    arrange(desc(n))
+  tab2 <- dx %>%
+    do(resumir(.$tempo)) %>%
+    mutate(value = round(value)) %>%
+    spread(name, value) %>%
+    ungroup()
+  res <- bind_rows(tab1, tab2)
+  res[[v[1]]][nrow(res)] <- 'Total'
+  res
+}
+```
+
+Existe, no entanto, uma diferença nos tempos dos processos em relação à esfera que o processo corre. Na esfera Estadual, o tempo mediano do processo é 19% maior que na esfera Federal.
+
+```{r}
+cnc_vis %>% 
+  tabela_tempos(esfera_processo) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+```
+
+
+```{r}
+# # cnc_vis %>% 
+# #   tabela_tempos(instancia, esfera_processo) %>% 
+# #   knitr::kable(caption = "",
+# #                format = 'html', 
+# #                table.attr = "class='table table-hover'")
+# 
+# 
+# cnc_vis %>% 
+#   tabela_tempos(publico) %>% 
+#   knitr::kable(caption = "",
+#                format = 'html', 
+#                table.attr = "class='table table-hover'")
+# 
+# cnc_vis %>% 
+#   tabela_tempos(sexo) %>% 
+#   knitr::kable(caption = "",
+#                format = 'html', 
+#                table.attr = "class='table table-hover'")
+# 
+# cnc_vis %>% 
+#   tabela_tempos(tipo_pessoa) %>% 
+#   knitr::kable(caption = "",
+#                format = 'html', 
+#                table.attr = "class='table table-hover'")
+# 
+# cnc_vis %>% 
+#   filter(instancia == '1 grau') %>% 
+#   tabela_tempos(uf_processo) %>% 
+#   filter(n > 200) %>% 
+#   knitr::kable(caption = "",
+#                format = 'html', 
+#                table.attr = "class='table table-hover'")
+```
+
+Em relação à proibição, o tempo médio é de `r round(mean(tidy_improb$duracao_proibicao, na.rm=T)/365)` anos. Existe uma grande concentração das punições em anos cheios e, por isso, as medianas e demais quartis dos tempos em cada unidade federativa ficam concentrados em dois a quatro anos. O maior tempo médio ocorre em RS, com 6 anos de proibição. Novamente, a duração da punição não apresenta grandes variações por esfera e por características dos condenados.
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'duracao_proibicao', uf_processo) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+Quando olhamos para os assuntos, observamos médias maiores em processos relacionados a enriquecimento ilícito, chegando a uma média de quase oito anos e meio.
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau') %>% 
+  tabela_tempos(tipo = 'duracao_proibicao', assunto_nm_all) %>% 
+  filter(n > 100) %>% 
+  mutate(assunto_nm_all = str_trunc(assunto_nm_all, 50)) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+Em relação à suspensão, o tempo médio também é de `r round(mean(tidy_improb$duracao_suspensao, na.rm=T)/365)` anos. Assim como na proibição, existe uma grande concentração de punições em anos cheios e, por isso, as medianas e demais quartis dos tempos em cada unidade federativa ficam concentrados em três a oito anos. O maior tempo médio ocorre em RR, com quase 6 anos de suspensão. Essa média é pouco distante de outras UFs como AC, DF, GO, e RS, que apresentam variação de menos de 100 dias. Novamente, a duração da punição não apresenta grandes variações por esfera e por características dos condenados.
+
+```{r}
+
+cnc_vis %>% 
+  filter(instancia == '1 grau', !is.na(uf_processo)) %>% 
+  tabela_tempos(tipo = 'duracao_suspensao', uf_processo) %>% 
+  # filter(n > 200) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
+
+Quando olhamos para os assuntos, novamente observamos médias maiores em processos relacionados a enriquecimento ilícito, chegando a uma média de pouco mais de sete anos e meio.
+
+```{r}
+cnc_vis %>% 
+  filter(instancia == '1 grau') %>% 
+  tabela_tempos(tipo = 'duracao_suspensao', assunto_nm_all) %>% 
+  filter(n > 100) %>% 
+  mutate(assunto_nm_all = str_trunc(assunto_nm_all, 50)) %>% 
+  knitr::kable(caption = "",
+               format = 'html', 
+               table.attr = "class='table table-hover'")
+
+```
 
 
